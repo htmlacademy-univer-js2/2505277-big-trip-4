@@ -5,7 +5,7 @@ import SortingView from '../view/sorting.js';
 import FilterView from '../view/filters.js';
 import EditingFormView from '../view/editingForm.js';
 import WaypointView from '../view/waypoint.js';
-import WaypoinListView from '../view/creationList.js';
+import WaypoinListView from '../view/waypointList.js';
 import TripInfoView from '../view/tripInfoView.js';
 
 const header = document.querySelector('.page-header');
