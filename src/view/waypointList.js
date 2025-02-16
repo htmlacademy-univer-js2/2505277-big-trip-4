@@ -5,6 +5,7 @@ function createListTemplate() {
   </ul>`;
 }
 
+
 export default class WaypoinListView {
   getTemplate() {
     return createListTemplate();
