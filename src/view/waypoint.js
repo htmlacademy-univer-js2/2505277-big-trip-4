@@ -1,45 +1,50 @@
 import { createElement } from '../render.js';
-import { humanizePointDate } from '../utils.js';
+import { humanizePointDate, getDateDifference, getDestinationById, getOffersByType } from '../utils.js';
+
+
 function createWaypointTemplate(point) {
-  // {
-  //   type: 'Taxi',
-  //   startDate: new Date('2019- 10:30'),
-  //   endDate: new Date('18/03/19 11:00'),
-  //   destination: 'Amsterdam',
-  //   price: 20,
-  //   additionalOptions: 'Order Uber',
-  // }
-  const { type, startDate, endDate, destination, price, additionalOptions } =
-    point;
+  const { type, price, startDate, endDate, isFavorite } = point;
   const dateStart = humanizePointDate(startDate);
   const dateEnd = humanizePointDate(endDate);
+
+  const destination = getDestinationById(point);
+
+  const offers = getOffersByType(point);
+
+  const selectedOffers = offers
+    .filter((offer) => point.offers.includes(offer.id))
+    .map((offer) => `
+      <li class="event__offer">
+        <span class="event__offer-title">${offer.title}</span>
+        &plus;&euro;&nbsp;
+        <span class="event__offer-price">${offer.price}</span>
+      </li>
+    `)
+    .join('');
+  const isFavoriteEvt = isFavorite ? 'event__favorite-btn--active' : '';
   return ` <li class="trip-events__item">
               <div class="event">
-                <time class="event__date" datetime="2019-03-18">${dateStart}</time>
+                <time class="event__date" datetime="2019-03-18">${dateStart.slice(0, 7)}</time>
                 <div class="event__type">
-                  <img class="event__type-icon" width="42" height="42" src="img/icons/taxi.png" alt="Event type icon">
+                  <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
                 </div>
-                <h3 class="event__title">${type} ${destination}</h3>
+                <h3 class="event__title">${type} ${destination.cityName}</h3>
                 <div class="event__schedule">
                   <p class="event__time">
-                    <time class="event__start-time" datetime="${dateStart}">10:30</time>
+                    <time class="event__start-time" datetime="2019-03-18T10:30">${dateStart.slice(7, 15)}</time>
                     &mdash;
-                    <time class="event__end-time" datetime="${dateEnd}">11:00</time>
+                    <time class="event__end-time" datetime="2019-03-18T11:00">${dateEnd.slice(7, 15)}</time>
                   </p>
-                  <p class="event__duration">30M</p>
+                  <p class="event__duration">${getDateDifference(startDate, endDate)}</p>
                 </div>
                 <p class="event__price">
                   &euro;&nbsp;<span class="event__price-value">${price}</span>
                 </p>
                 <h4 class="visually-hidden">Offers:</h4>
                 <ul class="event__selected-offers">
-                  <li class="event__offer">
-                    <span class="event__offer-title">${additionalOptions}</span>
-                    &plus;&euro;&nbsp;
-                    <span class="event__offer-price">20</span>
-                  </li>
+                 ${selectedOffers}
                 </ul>
-                <button class="event__favorite-btn event__favorite-btn--active" type="button">
+                <button class="event__favorite-btn ${isFavoriteEvt}" type="button">
                   <span class="visually-hidden">Add to favorite</span>
                   <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
                     <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
@@ -55,6 +60,7 @@ function createWaypointTemplate(point) {
 export default class WaypointView {
   constructor({ point }) {
     this.point = point;
+
   }
 
   getTemplate() {

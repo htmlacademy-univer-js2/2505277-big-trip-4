@@ -2,11 +2,11 @@ import {
   TripPlannerPresenter,
   siteContainerElement,
 } from './presenter/trip-presenter.js';
-import PointModel from './model/point-model.js';
-const pointModel = new PointModel();
+import PointsModel from './model/point-model.js';
+
+const pointModel = new PointsModel();
 const tripPlannerPresenter = new TripPlannerPresenter({
-  TripPlannerContainer: siteContainerElement,
-  pointModel,
+  TripPlannerContainer: siteContainerElement, pointModel
 });
 
 tripPlannerPresenter.init();

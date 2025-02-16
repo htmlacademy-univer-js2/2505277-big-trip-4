@@ -1,83 +1,99 @@
-import { getRandomArrayElement } from '../utils.js';
+import { getRandomInt, getDate, addNull, getRandomArrayElement } from '../utils.js';
+import { PRICE, MINUTES, HOUR } from './const.js';
 
-const mockPoint = [
+const date = getDate();
+const startHour = getRandomInt(HOUR.MIN, HOUR.MAX - 1);
+const startMinutes = getRandomInt(MINUTES.MIN, MINUTES.MAX - 1);
+
+const mockPoints = [
   {
-    type: 'Taxi',
-    startDate: new Date('2019-03-19 10:30'),
-    endDate: new Date('2019-03-19 11:00'),
-    destination: 'Amsterdam',
-    price: 20,
-    additionalOptions: 'Order Uber',
+    type: 'taxi',
+    destinationID: getRandomInt(1, 4),
+    startDate: new Date(`2019-${date} ${addNull(startHour)}:${addNull(startMinutes)}`),
+    endDate: new Date(`2019-${date} ${addNull(getRandomInt(startHour + 1, 23))}:${addNull(getRandomInt(startMinutes + 1, MINUTES.MAX))}`),
+    price: getRandomInt(PRICE.MIN, PRICE.MAX),
+    isFavorite: !!getRandomInt(0, 1),
+    offers: [1],
   },
 
   {
-    type: 'Drive',
-    startDate: new Date('2019-03-18 14:30'),
-    endDate: new Date('2019-03-18 16:05'),
-    destination: 'Chamonix',
-    price: 160,
-    additionalOptions: 'Rent a car ',
+    type: 'drive',
+    destinationID: getRandomInt(1, 4),
+    startDate: new Date(`2019-${date} ${addNull(startHour)}:${addNull(startMinutes)}`),
+    endDate: new Date(`2019-${date} ${addNull(getRandomInt(startHour + 1, 23))}:${addNull(getRandomInt(startMinutes + 1, MINUTES.MAX))}`),
+    price: getRandomInt(PRICE.MIN, PRICE.MAX),
+    isFavorite: !!getRandomInt(0, 1),
+    offers: [2, 3],
   },
   {
-    type: 'Drive',
-    startDate: new Date('2019-03-19 16:00'),
-    endDate: new Date('2019-03-19 17:00'),
-    destination: 'Geneva',
-    price: 20,
-    additionalOptions: '',
+    type: 'drive',
+    destinationID: getRandomInt(1, 4),
+    startDate: new Date(`2019-${date} ${addNull(startHour)}:${addNull(startMinutes)}`),
+    endDate: new Date(`2019-${date} ${addNull(getRandomInt(startHour + 1, 23))}:${addNull(getRandomInt(startMinutes + 1, MINUTES.MAX))}`),
+    price: getRandomInt(PRICE.MIN, PRICE.MAX),
+    isFavorite: !!getRandomInt(0, 1),
+    offers: [1, 2, 3],
   },
   {
-    type: 'Drive',
-    startDate: new Date('2019-03-20 08:25'),
-    endDate: new Date('2019-03-20 09:25'),
-    destination: 'Geneva',
-    price: 20,
-    additionalOptions: '',
+    type: 'drive',
+    destinationID: getRandomInt(1, 4),
+    startDate: new Date(`2019-${date} ${addNull(startHour)}:${addNull(startMinutes)}`),
+    endDate: new Date(`2019-${date} ${addNull(getRandomInt(startHour + 1, 23))}:${addNull(getRandomInt(startMinutes + 1, MINUTES.MAX))}`),
+    price: getRandomInt(PRICE.MIN, PRICE.MAX),
+    isFavorite: !!getRandomInt(0, 1),
+    offers: [1, 3],
   },
   {
-    type: 'Flight',
-    startDate: new Date('2019-03-18 12:25'),
-    endDate: new Date('2019-03-18 13:35'),
-    destination: 'Chamonix',
-    price: 160,
-    additionalOptions: 'Add luggage',
+    type: 'flight',
+    destinationID: getRandomInt(1, 4),
+    startDate: new Date(`2019-${date} ${addNull(startHour)}:${addNull(startMinutes)}`),
+    endDate: new Date(`2019-${date} ${addNull(getRandomInt(startHour + 1, 23))}:${addNull(getRandomInt(startMinutes + 1, MINUTES.MAX))}`),
+    price: getRandomInt(PRICE.MIN, PRICE.MAX),
+    isFavorite: !!getRandomInt(0, 1),
+    offers: [1],
   },
   {
-    type: 'Flight',
-    startDate: new Date('2019-03-19 18:00'),
-    endDate: new Date('2019-03-19 19:00'),
-    destination: 'Geneva',
-    price: 20,
-    additionalOptions: 'Add luggage',
+    type: 'flight',
+    destinationID: getRandomInt(1, 4),
+    startDate: new Date(`2019-${date} ${addNull(startHour)}:${addNull(startMinutes)}`),
+    endDate: new Date(`2019-${date} ${addNull(getRandomInt(startHour + 1, 23))}:${addNull(getRandomInt(startMinutes + 1, MINUTES.MAX))}`),
+    price: getRandomInt(PRICE.MIN, PRICE.MAX),
+    isFavorite: !!getRandomInt(0, 1),
+    offers: [3],
   },
   {
-    type: 'Check-in',
-    startDate: new Date('2019-03-18 16:20'),
-    endDate: new Date('2019-03-18 17:00'),
-    destination: 'Chamonix',
-    price: 600,
-    additionalOptions: 'Add breakfast',
+    type: 'check-in',
+    destinationID: getRandomInt(1, 4),
+    startDate: new Date(`2019-${date} ${addNull(startHour)}:${addNull(startMinutes)}`),
+    endDate: new Date(`2019-${date} ${addNull(getRandomInt(startHour + 1, 23))}:${addNull(getRandomInt(startMinutes + 1, MINUTES.MAX))}`),
+    price: getRandomInt(PRICE.MIN, PRICE.MAX),
+    isFavorite: !!getRandomInt(0, 1),
+    offers: [1],
   },
   {
-    type: 'Sightseeing',
-    startDate: new Date('2019-03-19 14:20'),
-    endDate: new Date('2019-03-19 13:00'),
-    destination: 'Chamonix',
-    price: 50,
-    additionalOptions: 'Book tickets',
+    type: 'sightseeing',
+    destinationID: getRandomInt(1, 4),
+    startDate: new Date(`2019-${date} ${addNull(startHour)}:${addNull(startMinutes)}`),
+    endDate: new Date(`2019-${date} ${addNull(getRandomInt(startHour + 1, 23))}:${addNull(getRandomInt(startMinutes + 1, MINUTES.MAX))}`),
+    price: getRandomInt(PRICE.MIN, PRICE.MAX),
+    isFavorite: !!getRandomInt(0, 1),
+    offers: [1],
   },
   {
-    type: 'Sightseeing',
-    startDate: new Date('2019-03-19 11:15'),
-    endDate: new Date('2019-03-19 12:15'),
-    destination: 'Geneva',
-    price: 180,
-    additionalOptions: 'Book tickets',
+    type: 'sightseeing',
+    destinationID: getRandomInt(1, 4),
+    startDate: new Date(`2019-${date} ${addNull(startHour)}:${addNull(startMinutes)}`),
+    endDate: new Date(`2019-${date} ${addNull(getRandomInt(startHour + 1, 23))}:${addNull(getRandomInt(startMinutes + 1, MINUTES.MAX))}`),
+    price: getRandomInt(PRICE.MIN, PRICE.MAX),
+    isFavorite: !!getRandomInt(0, 1),
+    offers: [2],
   },
 ];
 
 function getRandomPoint() {
-  return getRandomArrayElement(mockPoint);
+  return getRandomArrayElement(mockPoints);
 }
 
 export { getRandomPoint };
+
+
