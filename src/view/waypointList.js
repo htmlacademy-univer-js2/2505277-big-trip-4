@@ -5,7 +5,8 @@ function createListTemplate() {
   </ul>`;
 }
 
-export default class ListView {
+
+export default class WaypoinListView {
   getTemplate() {
     return createListTemplate();
   }

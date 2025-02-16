@@ -23,6 +23,7 @@ export default class TripPlannerPresenter {
   }
 
   init() {
+
     this.point = [...this.pointModel.getPoints()];
 
     render(new TripInfoView(), tripMain, RenderPosition.AFTERBEGIN);
