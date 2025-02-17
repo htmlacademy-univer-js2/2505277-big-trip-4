@@ -1,5 +1,6 @@
 import { createElement } from '../render.js';
-import { humanizePointDate, getDateDifference, getDestinationById, getOffersByType } from '../utils.js';
+import { humanizePointDate, getDateDifference } from '../utils/date.js';
+import { getDestinationById, getOffersByType } from '../utils/mock.js';
 
 
 function createWaypointTemplate(point) {

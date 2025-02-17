@@ -1,4 +1,5 @@
-import { getRandomInt, getDate, addNull, getRandomArrayElement } from '../utils.js';
+import { getRandomInt, getRandomArrayElement } from '../utils/random.js';
+import { getDate, addNull, getRandomEndDate, getRandomStartDate } from '../utils/date.js';
 import { PRICE, MINUTES, HOUR } from './const.js';
 
 const date = getDate();
@@ -9,7 +10,7 @@ const mockPoints = [
   {
     type: 'taxi',
     destinationID: getRandomInt(1, 4),
-    startDate: new Date(`2019-${date} ${addNull(startHour)}:${addNull(startMinutes)}`),
+    startDate: new Date(getRandomStartDate(date, startHour, startMinutes)),
     endDate: new Date(`2019-${date} ${addNull(getRandomInt(startHour + 1, 23))}:${addNull(getRandomInt(startMinutes + 1, MINUTES.MAX))}`),
     price: getRandomInt(PRICE.MIN, PRICE.MAX),
     isFavorite: !!getRandomInt(0, 1),
@@ -19,8 +20,8 @@ const mockPoints = [
   {
     type: 'drive',
     destinationID: getRandomInt(1, 4),
-    startDate: new Date(`2019-${date} ${addNull(startHour)}:${addNull(startMinutes)}`),
-    endDate: new Date(`2019-${date} ${addNull(getRandomInt(startHour + 1, 23))}:${addNull(getRandomInt(startMinutes + 1, MINUTES.MAX))}`),
+    startDate: new Date(getRandomStartDate(date, startHour, startMinutes)),
+    endDate: new Date(getRandomEndDate(date, startHour, startMinutes, MINUTES)),
     price: getRandomInt(PRICE.MIN, PRICE.MAX),
     isFavorite: !!getRandomInt(0, 1),
     offers: [2, 3],
@@ -28,8 +29,8 @@ const mockPoints = [
   {
     type: 'drive',
     destinationID: getRandomInt(1, 4),
-    startDate: new Date(`2019-${date} ${addNull(startHour)}:${addNull(startMinutes)}`),
-    endDate: new Date(`2019-${date} ${addNull(getRandomInt(startHour + 1, 23))}:${addNull(getRandomInt(startMinutes + 1, MINUTES.MAX))}`),
+    startDate: new Date(getRandomStartDate(date, startHour, startMinutes)),
+    endDate: new Date(getRandomEndDate(date, startHour, startMinutes, MINUTES)),
     price: getRandomInt(PRICE.MIN, PRICE.MAX),
     isFavorite: !!getRandomInt(0, 1),
     offers: [1, 2, 3],
@@ -37,8 +38,8 @@ const mockPoints = [
   {
     type: 'drive',
     destinationID: getRandomInt(1, 4),
-    startDate: new Date(`2019-${date} ${addNull(startHour)}:${addNull(startMinutes)}`),
-    endDate: new Date(`2019-${date} ${addNull(getRandomInt(startHour + 1, 23))}:${addNull(getRandomInt(startMinutes + 1, MINUTES.MAX))}`),
+    startDate: new Date(getRandomStartDate(date, startHour, startMinutes)),
+    endDate: new Date(getRandomEndDate(date, startHour, startMinutes, MINUTES)),
     price: getRandomInt(PRICE.MIN, PRICE.MAX),
     isFavorite: !!getRandomInt(0, 1),
     offers: [1, 3],
@@ -46,8 +47,8 @@ const mockPoints = [
   {
     type: 'flight',
     destinationID: getRandomInt(1, 4),
-    startDate: new Date(`2019-${date} ${addNull(startHour)}:${addNull(startMinutes)}`),
-    endDate: new Date(`2019-${date} ${addNull(getRandomInt(startHour + 1, 23))}:${addNull(getRandomInt(startMinutes + 1, MINUTES.MAX))}`),
+    startDate: new Date(getRandomStartDate(date, startHour, startMinutes)),
+    endDate: new Date(getRandomEndDate(date, startHour, startMinutes, MINUTES)),
     price: getRandomInt(PRICE.MIN, PRICE.MAX),
     isFavorite: !!getRandomInt(0, 1),
     offers: [1],
@@ -55,8 +56,8 @@ const mockPoints = [
   {
     type: 'flight',
     destinationID: getRandomInt(1, 4),
-    startDate: new Date(`2019-${date} ${addNull(startHour)}:${addNull(startMinutes)}`),
-    endDate: new Date(`2019-${date} ${addNull(getRandomInt(startHour + 1, 23))}:${addNull(getRandomInt(startMinutes + 1, MINUTES.MAX))}`),
+    startDate: new Date(getRandomStartDate(date, startHour, startMinutes)),
+    endDate: new Date(getRandomEndDate(date, startHour, startMinutes, MINUTES)),
     price: getRandomInt(PRICE.MIN, PRICE.MAX),
     isFavorite: !!getRandomInt(0, 1),
     offers: [3],
@@ -64,8 +65,8 @@ const mockPoints = [
   {
     type: 'check-in',
     destinationID: getRandomInt(1, 4),
-    startDate: new Date(`2019-${date} ${addNull(startHour)}:${addNull(startMinutes)}`),
-    endDate: new Date(`2019-${date} ${addNull(getRandomInt(startHour + 1, 23))}:${addNull(getRandomInt(startMinutes + 1, MINUTES.MAX))}`),
+    startDate: new Date(getRandomStartDate(date, startHour, startMinutes)),
+    endDate: new Date(getRandomEndDate(date, startHour, startMinutes, MINUTES)),
     price: getRandomInt(PRICE.MIN, PRICE.MAX),
     isFavorite: !!getRandomInt(0, 1),
     offers: [1],
@@ -73,8 +74,8 @@ const mockPoints = [
   {
     type: 'sightseeing',
     destinationID: getRandomInt(1, 4),
-    startDate: new Date(`2019-${date} ${addNull(startHour)}:${addNull(startMinutes)}`),
-    endDate: new Date(`2019-${date} ${addNull(getRandomInt(startHour + 1, 23))}:${addNull(getRandomInt(startMinutes + 1, MINUTES.MAX))}`),
+    startDate: new Date(getRandomStartDate(date, startHour, startMinutes)),
+    endDate: new Date(getRandomEndDate(date, startHour, startMinutes, MINUTES)),
     price: getRandomInt(PRICE.MIN, PRICE.MAX),
     isFavorite: !!getRandomInt(0, 1),
     offers: [1],
@@ -82,8 +83,8 @@ const mockPoints = [
   {
     type: 'sightseeing',
     destinationID: getRandomInt(1, 4),
-    startDate: new Date(`2019-${date} ${addNull(startHour)}:${addNull(startMinutes)}`),
-    endDate: new Date(`2019-${date} ${addNull(getRandomInt(startHour + 1, 23))}:${addNull(getRandomInt(startMinutes + 1, MINUTES.MAX))}`),
+    startDate: new Date(getRandomStartDate(date, startHour, startMinutes)),
+    endDate: new Date(getRandomEndDate(date, startHour, startMinutes, MINUTES)),
     price: getRandomInt(PRICE.MIN, PRICE.MAX),
     isFavorite: !!getRandomInt(0, 1),
     offers: [2],

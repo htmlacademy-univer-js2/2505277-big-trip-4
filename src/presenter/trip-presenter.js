@@ -23,17 +23,18 @@ export default class TripPlannerPresenter {
   }
 
   init() {
-    this.point = [...this.pointModel.getPoints()];
+    this.points = [...this.pointModel.getPoints()];
 
     render(new TripInfoView(), tripMain, RenderPosition.AFTERBEGIN);
     render(new FilterView(), tripMain, RenderPosition.BEFOREEND);
     render(new SortingView(), this.TripPlannerContainer);
     render(this.listComponent, this.TripPlannerContainer);
-    render(new EditingFormView({ point: this.point[0] }), this.listComponent.getElement());
+    render(new EditingFormView({ point: this.points[0] }), this.listComponent.getElement());
     render(new CreationFormView(), this.listComponent.getElement());
-    for (let i = 0; i < this.point.length; i++) {
-      render(new WaypointView({ point: this.point[i] }), this.listComponent.getElement());
-    }
+    this.points.forEach((point) => {
+      render(new WaypointView({ point: point }), this.listComponent.getElement());
+    });
+
   }
 }
 

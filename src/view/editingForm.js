@@ -1,6 +1,6 @@
 import { createElement } from '../render.js';
-import { humanizeEditingFormDate } from '../utils.js';
-import { getDestinationById, getOffersByType } from '../utils.js';
+import { humanizeEditingFormDate } from '../utils/date.js';
+import { getDestinationById, getOffersByType } from '../utils/mock.js';
 
 function createEditingFormTemplate(point) {
   const { type, price, startDate, endDate } = point;

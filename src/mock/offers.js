@@ -1,5 +1,5 @@
 import { PRICE } from './const.js';
-import { getRandomInt } from '../utils.js';
+import { getRandomInt } from '../utils/random.js';
 
 const mockOffers = [
   {
