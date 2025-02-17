@@ -6,4 +6,8 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export { getRandomInt, getRandomArrayElement };
+function getRandomBoolean() {
+  return Math.random() >= 0.5;
+}
+
+export { getRandomInt, getRandomArrayElement, getRandomBoolean };
