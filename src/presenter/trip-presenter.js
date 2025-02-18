@@ -27,7 +27,7 @@ export default class TripPlannerPresenter {
   #listComponent = new WaypoinListView();
 
   init() {
-    this.points = [...this.#pointModel.getPoints()];
+    this.points = [...this.#pointModel.points];
 
     render(new TripInfoView(), tripMain, RenderPosition.AFTERBEGIN);
     render(new FilterView(), tripMain, RenderPosition.BEFOREEND);
@@ -36,9 +36,14 @@ export default class TripPlannerPresenter {
     render(new EditingFormView({ point: this.points[0] }), this.#listComponent.element);
     render(new CreationFormView(), this.#listComponent.element);
     this.points.forEach((point) => {
-      render(new WaypointView({ point: point }), this.#listComponent.element);
+      this.#renderPoint(point);
     });
 
+  }
+
+  #renderPoint(point) {
+    const pointComponent = new WaypointView({ point });
+    render(pointComponent, this.#listComponent.element);
   }
 }
 
