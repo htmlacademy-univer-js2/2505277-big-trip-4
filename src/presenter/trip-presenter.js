@@ -1,5 +1,5 @@
-import { render, RenderPosition } from '../render.js';
-
+import { RenderPosition } from '../render.js';
+import { render } from '../framework/render.js';
 import CreationFormView from '../view/creationForm.js';
 import SortingView from '../view/sorting.js';
 import FilterView from '../view/filters.js';
@@ -29,10 +29,10 @@ export default class TripPlannerPresenter {
     render(new FilterView(), tripMain, RenderPosition.BEFOREEND);
     render(new SortingView(), this.TripPlannerContainer);
     render(this.listComponent, this.TripPlannerContainer);
-    render(new EditingFormView({ point: this.points[0] }), this.listComponent.getElement());
-    render(new CreationFormView(), this.listComponent.getElement());
+    render(new EditingFormView({ point: this.points[0] }), this.listComponent.element);
+    render(new CreationFormView(), this.listComponent.element);
     this.points.forEach((point) => {
-      render(new WaypointView({ point: point }), this.listComponent.getElement());
+      render(new WaypointView({ point: point }), this.listComponent.element);
     });
 
   }

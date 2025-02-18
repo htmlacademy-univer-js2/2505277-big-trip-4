@@ -1,6 +1,6 @@
-import { createElement } from '../render.js';
 import { humanizeEditingFormDate } from '../utils/date.js';
 import { getDestinationById, getOffersByType } from '../utils/mock.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createEditingFormTemplate(point) {
   const { type, price, startDate, endDate } = point;
@@ -138,23 +138,15 @@ function createEditingFormTemplate(point) {
 `;
 }
 
-export default class EditingFormView {
+export default class EditingFormView extends AbstractView {
+  #point = null;
+
   constructor({ point }) {
-    this.point = point;
+    super();
+    this.#point = point;
   }
 
-  getTemplate() {
-    return createEditingFormTemplate(this.point);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  get template() {
+    return createEditingFormTemplate(this.#point);
   }
 }
