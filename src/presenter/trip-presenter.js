@@ -16,23 +16,27 @@ const siteContainerElement = siteMainElement.querySelector(
 );
 
 export default class TripPlannerPresenter {
-  listComponent = new WaypoinListView();
+  #TripPlannerContainer = null;
+  #pointModel = null;
+
   constructor({ TripPlannerContainer, pointModel }) {
-    this.TripPlannerContainer = TripPlannerContainer;
-    this.pointModel = pointModel;
+    this.#TripPlannerContainer = TripPlannerContainer;
+    this.#pointModel = pointModel;
   }
 
+  #listComponent = new WaypoinListView();
+
   init() {
-    this.points = [...this.pointModel.getPoints()];
+    this.points = [...this.#pointModel.getPoints()];
 
     render(new TripInfoView(), tripMain, RenderPosition.AFTERBEGIN);
     render(new FilterView(), tripMain, RenderPosition.BEFOREEND);
-    render(new SortingView(), this.TripPlannerContainer);
-    render(this.listComponent, this.TripPlannerContainer);
-    render(new EditingFormView({ point: this.points[0] }), this.listComponent.element);
-    render(new CreationFormView(), this.listComponent.element);
+    render(new SortingView(), this.#TripPlannerContainer);
+    render(this.#listComponent, this.#TripPlannerContainer);
+    render(new EditingFormView({ point: this.points[0] }), this.#listComponent.element);
+    render(new CreationFormView(), this.#listComponent.element);
     this.points.forEach((point) => {
-      render(new WaypointView({ point: point }), this.listComponent.element);
+      render(new WaypointView({ point: point }), this.#listComponent.element);
     });
 
   }
