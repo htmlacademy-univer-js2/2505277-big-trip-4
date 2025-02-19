@@ -60,12 +60,21 @@ function createWaypointTemplate(point) {
 
 export default class WaypointView extends AbstractView {
   #point = null;
-  constructor({ point }) {
+  #button = null;
+  constructor({ point, onButtonClick }) {
     super();
     this.#point = point;
+    this.#button = onButtonClick;
+
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#buttonClickHandler);
   }
 
   get template() {
     return createWaypointTemplate(this.#point);
   }
+
+  #buttonClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#button();
+  };
 }
