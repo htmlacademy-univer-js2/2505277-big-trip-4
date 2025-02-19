@@ -141,15 +141,15 @@ function createEditingFormTemplate(point) {
 export default class EditingFormView extends AbstractView {
   #point = null;
   #handleFormSubmit = null;
-  #button = null;
+  #handleEditClick = null;
   constructor({ point, onFormSubmit, onButtonClick }) {
     super();
     this.#point = point;
     this.#handleFormSubmit = onFormSubmit;
-    this.#button = onButtonClick;
+    this.#handleEditClick = onButtonClick;
 
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#buttonClickHandler);
-    this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler)
+    this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler);
   }
 
   get template() {
@@ -163,6 +163,6 @@ export default class EditingFormView extends AbstractView {
 
   #buttonClickHandler = (evt) => {
     evt.preventDefault();
-    this.#button();
+    this.#handleEditClick();
   };
 }

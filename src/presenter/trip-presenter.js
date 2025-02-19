@@ -73,10 +73,6 @@ export default class TripPlannerPresenter {
     render(pointComponent, this.#listComponent.element);
   }
 
-  #renderEditingForm(points) {
-    const editingFormComponent = EditingFormView({ points });
-    render(editingFormComponent, this.#listComponent.element);
-  }
 }
 
 export { TripPlannerPresenter, siteContainerElement };
