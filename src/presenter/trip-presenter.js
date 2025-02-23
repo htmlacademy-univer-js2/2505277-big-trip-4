@@ -6,6 +6,7 @@ import FilterView from '../view/filters.js';
 import WaypointListView from '../view/waypointList.js';
 import TripInfoView from '../view/tripInfoView.js';
 import PointPresenter from './point-presenter.js';
+import { updateItem } from '../utils/databind.js';
 
 const header = document.querySelector('.page-header');
 const tripMain = header.querySelector('.trip-main');
@@ -21,7 +22,8 @@ export default class TripPlannerPresenter {
   #tripInfoView = new TripInfoView();
   #filterView = new FilterView();
   #creationForm = new CreationFormView();
-
+  #pointPresenters = new Map();
+  #points = [];
   constructor({ TripPlannerContainer, pointModel }) {
     this.#TripPlannerContainer = TripPlannerContainer;
     this.#pointModel = pointModel;
@@ -30,9 +32,18 @@ export default class TripPlannerPresenter {
   #listComponent = new WaypointListView();
 
   init() {
-    this.points = [...this.#pointModel.points];
+    this.#points = [...this.#pointModel.points];
     this.#renderTrip();
   }
+
+  #handleModeChange = () => {
+    this.#pointPresenters.forEach((presenter) => presenter.resetView());
+  };
+
+  #handlePointChange = (updatedPoint) => {
+    this.#points = updateItem(this.#points, updatedPoint);
+    this.#pointPresenters.get(updatedPoint.id).init(updatedPoint);
+  };
 
   #renderCreationForm() {
     render(this.#creationForm, this.#listComponent.element);
@@ -57,8 +68,11 @@ export default class TripPlannerPresenter {
   #renderPoint(point) {
     const pointPresenter = new PointPresenter({
       listComponent: this.#listComponent.element,
+      onDataChange: this.#handlePointChange,
+      onModeChange: this.#handleModeChange
     });
     pointPresenter.init(point);
+    this.#pointPresenters.set(point.id, pointPresenter);
   }
 
   #renderTrip() {
@@ -67,7 +81,7 @@ export default class TripPlannerPresenter {
     this.#renderFilter();
     this.#renderWaypointList();
     this.#renderCreationForm();
-    this.points.forEach((point) => {
+    this.#points.forEach((point) => {
       this.#renderPoint(point);
     });
   }

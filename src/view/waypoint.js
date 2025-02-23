@@ -61,12 +61,19 @@ function createWaypointTemplate(point) {
 export default class WaypointView extends AbstractView {
   #point = null;
   #handleEditClick = null;
-  constructor({ point, onButtonClick }) {
+
+  #handleFavoriteClick = null;
+  #handleUnfavoriteClick = null;
+
+  constructor({ point, onButtonClick, onFavoriteClick, onUnfavoriteClick }) {
     super();
     this.#point = point;
     this.#handleEditClick = onButtonClick;
-
+    this.#handleFavoriteClick = onFavoriteClick;
+    this.#handleUnfavoriteClick = onUnfavoriteClick;
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#buttonClickHandler);
+    this.element.querySelector('.event__favorite-btn').addEventListener('click', this.#favoriteClickHandler);
+    this.element.querySelector('.event__favorite-btn').addEventListener('click', this.#unfavoriteClickHandler);
   }
 
   get template() {
@@ -76,5 +83,15 @@ export default class WaypointView extends AbstractView {
   #buttonClickHandler = (evt) => {
     evt.preventDefault();
     this.#handleEditClick();
+  };
+
+  #favoriteClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFavoriteClick();
+  };
+
+  #unfavoriteClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleUnfavoriteClick();
   };
 }
