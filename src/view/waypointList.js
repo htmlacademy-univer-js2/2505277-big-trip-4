@@ -5,7 +5,7 @@ function createListTemplate() {
   </ul>`;
 }
 
-export default class WaypoinListView extends AbstractView {
+export default class WaypointListView extends AbstractView {
   get template() {
     return createListTemplate();
   }

@@ -5,7 +5,7 @@ import SortingView from '../view/sorting.js';
 import FilterView from '../view/filters.js';
 import EditingFormView from '../view/editingForm.js';
 import WaypointView from '../view/waypoint.js';
-import WaypoinListView from '../view/waypointList.js';
+import WaypointListView from '../view/waypointList.js';
 import TripInfoView from '../view/tripInfoView.js';
 
 const header = document.querySelector('.page-header');
@@ -18,17 +18,41 @@ const siteContainerElement = siteMainElement.querySelector(
 export default class TripPlannerPresenter {
   #TripPlannerContainer = null;
   #pointModel = null;
+  #sortComponent = new SortingView();
+  #tripInfoView = new TripInfoView();
+  #filterView = new FilterView();
+  #creationForm = new CreationFormView();
 
   constructor({ TripPlannerContainer, pointModel }) {
     this.#TripPlannerContainer = TripPlannerContainer;
     this.#pointModel = pointModel;
   }
 
-  #listComponent = new WaypoinListView();
+  #listComponent = new WaypointListView();
 
   init() {
     this.points = [...this.#pointModel.points];
     this.#renderTrip();
+  }
+
+  #renderCreationForm() {
+    render(this.#creationForm, this.#listComponent.element);
+  }
+
+  #renderWaypointList() {
+    render(this.#listComponent, this.#TripPlannerContainer);
+  }
+
+  #renderSort() {
+    render(this.#sortComponent, this.#TripPlannerContainer);
+  }
+
+  #renderTripInfo() {
+    render(this.#tripInfoView, tripMain, RenderPosition.AFTERBEGIN);
+  }
+
+  #renderFilter() {
+    render(this.#filterView, tripMain, RenderPosition.BEFOREEND);
   }
 
   #renderPoint(point) {
@@ -65,13 +89,11 @@ export default class TripPlannerPresenter {
   }
 
   #renderTrip() {
-
-    render(new TripInfoView(), tripMain, RenderPosition.AFTERBEGIN);
-    render(new FilterView(), tripMain, RenderPosition.BEFOREEND);
-    render(new SortingView(), this.#TripPlannerContainer);
-
-    render(this.#listComponent, this.#TripPlannerContainer);
-    render(new CreationFormView(), this.#listComponent.element);
+    this.#renderTripInfo();
+    this.#renderSort();
+    this.#renderFilter();
+    this.#renderWaypointList();
+    this.#renderCreationForm();
     this.points.forEach((point) => {
       this.#renderPoint(point);
     });
