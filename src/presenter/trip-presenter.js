@@ -1,12 +1,11 @@
 import { RenderPosition } from '../render.js';
-import { render, replace } from '../framework/render.js';
+import { render } from '../framework/render.js';
 import CreationFormView from '../view/creationForm.js';
 import SortingView from '../view/sorting.js';
 import FilterView from '../view/filters.js';
-import EditingFormView from '../view/editingForm.js';
-import WaypointView from '../view/waypoint.js';
 import WaypointListView from '../view/waypointList.js';
 import TripInfoView from '../view/tripInfoView.js';
+import PointPresenter from './point-presenter.js';
 
 const header = document.querySelector('.page-header');
 const tripMain = header.querySelector('.trip-main');
@@ -56,36 +55,10 @@ export default class TripPlannerPresenter {
   }
 
   #renderPoint(point) {
-    const escKeyDownHandler = (evt) => {
-      if (evt.key === 'Escape') {
-        evt.preventDefault();
-        replaceFormToCard();
-        document.removeEventListener('keydown', escKeyDownHandler);
-      }
-    };
-    const pointComponent = new WaypointView({
-      point, onButtonClick: () => {
-        replaceCardToForm();
-        document.addEventListener('keydown', escKeyDownHandler);
-      }
+    const pointPresenter = new PointPresenter({
+      listComponent: this.#listComponent.element,
     });
-    const pointEditComponent = new EditingFormView({
-      point,
-      onFormSubmit: () => {
-        replaceFormToCard();
-        document.removeEventListener('keydown', escKeyDownHandler);
-      }, onButtonClick: () => {
-        replaceFormToCard();
-        document.addEventListener('keydown', escKeyDownHandler);
-      }
-    });
-    function replaceCardToForm() {
-      replace(pointEditComponent, pointComponent);
-    }
-    function replaceFormToCard() {
-      replace(pointComponent, pointEditComponent);
-    }
-    render(pointComponent, this.#listComponent.element);
+    pointPresenter.init(point);
   }
 
   #renderTrip() {
