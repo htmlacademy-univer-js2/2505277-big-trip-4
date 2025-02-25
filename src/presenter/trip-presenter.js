@@ -6,7 +6,7 @@ import FilterView from '../view/filters.js';
 import WaypointListView from '../view/waypointList.js';
 import TripInfoView from '../view/tripInfoView.js';
 import PointPresenter from './point-presenter.js';
-import { updateItem } from '../utils/databind.js';
+import { updatePointData } from '../utils/databind.js';
 
 const header = document.querySelector('.page-header');
 const tripMain = header.querySelector('.trip-main');
@@ -36,14 +36,6 @@ export default class TripPlannerPresenter {
     this.#renderTrip();
   }
 
-  #handleModeChange = () => {
-    this.#pointPresenters.forEach((presenter) => presenter.resetView());
-  };
-
-  #handlePointChange = (updatedPoint) => {
-    this.#points = updateItem(this.#points, updatedPoint);
-    this.#pointPresenters.get(updatedPoint.id).init(updatedPoint);
-  };
 
   #renderCreationForm() {
     render(this.#creationForm, this.#listComponent.element);
@@ -74,6 +66,15 @@ export default class TripPlannerPresenter {
     pointPresenter.init(point);
     this.#pointPresenters.set(point.id, pointPresenter);
   }
+
+  #handleModeChange = () => {
+    this.#pointPresenters.forEach((presenter) => presenter.resetView());
+  };
+
+  #handlePointChange = (updatedPoint) => {
+    this.#points = updatePointData(this.#points, updatedPoint);
+    this.#pointPresenters.get(updatedPoint.id).init(updatedPoint);
+  };
 
   #renderTrip() {
     this.#renderTripInfo();

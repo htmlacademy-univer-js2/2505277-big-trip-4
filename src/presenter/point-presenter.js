@@ -2,6 +2,7 @@ import { render, replace, remove } from '../framework/render';
 import WaypointView from '../view/waypoint';
 import EditingFormView from '../view/editingForm';
 
+
 const Mode = {
   DEFAULT: 'DEFAULT',
   EDITING: 'EDITING',
@@ -13,9 +14,8 @@ export default class PointPresenter {
   #handleModeChange = null;
   #pointComponent = null;
   #pointEditComponent = null;
-
-  #point = null;
   #mode = Mode.DEFAULT;
+  #point = null;
   constructor({ listComponent, onDataChange, onModeChange }) {
     this.#listComponent = listComponent;
     this.#handleDataChange = onDataChange;
@@ -31,33 +31,29 @@ export default class PointPresenter {
     this.#pointComponent = new WaypointView({
       point: this.#point,
       onButtonClick: this.#handleEditClick,
-      onFavoriteClick: this.#handleFavoriteClick,
-      onUnfavoriteClick: this.#handleUnfavoriteClick
+      onFavoriteClick: this.#onHandleFavoriteClick,
     });
     this.#pointEditComponent = new EditingFormView({
       point: this.#point,
       onFormSubmit: this.#handleFormSubmit,
+      onFormHide: this.#handleHideForm,
     });
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
       render(this.#pointComponent, this.#listComponent);
       return;
     }
+
     if (this.#mode === Mode.DEFAULT) {
       replace(this.#pointComponent, prevPointComponent);
     }
 
-    if (this.#mode === Mode.DEFAULT) {
+    if (this.#mode === Mode.EDITING) {
       replace(this.#pointEditComponent, prevPointEditComponent);
     }
 
     remove(prevPointComponent);
     remove(prevPointEditComponent);
-  }
-
-  destroy() {
-    remove(this.#pointComponent);
-    remove(this.#pointEditComponent);
   }
 
   resetView() {
@@ -68,14 +64,13 @@ export default class PointPresenter {
 
   #replaceCardToForm() {
     replace(this.#pointEditComponent, this.#pointComponent);
-    document.addEventListener('keydown', this.#escKeyDownHandler);
     this.#handleModeChange();
     this.#mode = Mode.EDITING;
+
   }
 
   #replaceFormToCard() {
     replace(this.#pointComponent, this.#pointEditComponent);
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
     this.#mode = Mode.DEFAULT;
   }
 
@@ -86,11 +81,7 @@ export default class PointPresenter {
     }
   };
 
-  #handleFavoriteClick = () => {
-    this.#handleDataChange({ ...this.#point, isFavorite: !this.#point.isFavorite });
-  };
-
-  #handleUnfavoriteClick = () => {
+  #onHandleFavoriteClick = () => {
     this.#handleDataChange({ ...this.#point, isFavorite: !this.#point.isFavorite });
   };
 
@@ -103,4 +94,8 @@ export default class PointPresenter {
     this.#replaceFormToCard();
   };
 
+  #handleHideForm = () => {
+    this.#replaceFormToCard();
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
+  };
 }

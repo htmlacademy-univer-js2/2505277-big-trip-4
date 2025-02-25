@@ -1,5 +1,5 @@
-function updateItem(items, update) {
-  return items.map((item) => item.id === update.id ? update : item);
+function updatePointData(points, updatedPointData) {
+  return points.map((point) => point.id === updatedPointData.id ? updatedPointData : point);
 }
 
-export { updateItem };
+export { updatePointData };

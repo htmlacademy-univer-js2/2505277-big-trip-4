@@ -142,13 +142,15 @@ export default class EditingFormView extends AbstractView {
   #point = null;
   #handleFormSubmit = null;
   #handleEditClick = null;
-  constructor({ point, onFormSubmit, onButtonClick }) {
+  #handleHideForm = null;
+  constructor({ point, onFormSubmit, onButtonClick, onFormHide }) {
     super();
     this.#point = point;
     this.#handleFormSubmit = onFormSubmit;
     this.#handleEditClick = onButtonClick;
+    this.#handleHideForm = onFormHide;
 
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#buttonClickHandler);
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#resetButtonClick);
     this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler);
   }
 
@@ -161,8 +163,9 @@ export default class EditingFormView extends AbstractView {
     this.#handleFormSubmit(this.#point);
   };
 
-  #buttonClickHandler = (evt) => {
+  #resetButtonClick = (evt) => {
     evt.preventDefault();
-    this.#handleEditClick();
+    this.#handleHideForm();
+    // this.element.querySelector('.event__rollup-btn').removeEventListener('click', this.#buttonDoubleClickHandler);
   };
 }
