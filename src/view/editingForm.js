@@ -166,6 +166,5 @@ export default class EditingFormView extends AbstractView {
   #resetButtonClick = (evt) => {
     evt.preventDefault();
     this.#handleHideForm();
-    // this.element.querySelector('.event__rollup-btn').removeEventListener('click', this.#buttonDoubleClickHandler);
   };
 }

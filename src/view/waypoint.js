@@ -83,9 +83,6 @@ export default class WaypointView extends AbstractView {
   #buttonClickHandler = (evt) => {
     evt.preventDefault();
     this.#handleEditClick();
-
-    // this.element.querySelector('.event__rollup-btn').removeEventListener('click', this.#buttonClickHandler);
-
   };
 
   #favoriteClickHandler = (evt) => {

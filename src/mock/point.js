@@ -1,6 +1,7 @@
 import { getRandomInt, getRandomArrayElement, getRandomBoolean } from '../utils/random.js';
 import { getDate, addNull, getRandomEndDate, getRandomStartDate } from '../utils/date.js';
 import { PRICE, MINUTES, HOUR } from './const.js';
+import { nanoid } from 'nanoid';
 
 const date = getDate();
 const startHour = getRandomInt(HOUR.MIN, HOUR.MAX - 1);
@@ -92,7 +93,10 @@ const mockPoints = [
 ];
 
 function getRandomPoint() {
-  return getRandomArrayElement(mockPoints);
+  return {
+    id: nanoid(),
+    ...getRandomArrayElement(mockPoints)
+  };
 }
 
 export { getRandomPoint };
