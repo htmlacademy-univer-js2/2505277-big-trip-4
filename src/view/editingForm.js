@@ -1,14 +1,19 @@
 import { humanizeEditingFormDate } from '../utils/date.js';
-import { getDestinationById, getOffersByType } from '../utils/mock.js';
-import AbstractView from '../framework/view/abstract-view.js';
+import { getDestinationById, getOffersByType, getDestinationByCityName, setSaveButtonDisabled } from '../utils/mock.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
+import { POINT_TYPES } from '../mock/const.js';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 
 function createEditingFormTemplate(point) {
   const { type, price, startDate, endDate } = point;
+
   const dateStart = humanizeEditingFormDate(startDate);
   const dateEnd = humanizeEditingFormDate(endDate);
   const destination = getDestinationById(point);
 
   const offers = getOffersByType(point);
+
   const offersTemplate = offers
     .map((offer) => {
       const checked = point.offers.includes(offer.id) ? 'checked' : '';
@@ -22,6 +27,12 @@ function createEditingFormTemplate(point) {
       </div>`;
     })
     .join('');
+  const pointTypeTemplate = POINT_TYPES.map((pointType) => `
+   <div class="event__type-item">
+                          <input id="event-type-${pointType}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${pointType}">
+                          <label class="event__type-label  event__type-label--${pointType}" for="event-type-${pointType}-1">${pointType}</label>
+                        </div>
+  `).join('');
   return `
  <li class="trip-events__item">
               <form class="event event--edit" action="#" method="post">
@@ -36,51 +47,7 @@ function createEditingFormTemplate(point) {
                     <div class="event__type-list">
                       <fieldset class="event__type-group">
                         <legend class="visually-hidden">Event type</legend>
-
-                        <div class="event__type-item">
-                          <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi">
-                          <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
-                        </div>
-
-                        <div class="event__type-item">
-                          <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus">
-                          <label class="event__type-label  event__type-label--bus" for="event-type-bus-1">Bus</label>
-                        </div>
-
-                        <div class="event__type-item">
-                          <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train">
-                          <label class="event__type-label  event__type-label--train" for="event-type-train-1">Train</label>
-                        </div>
-
-                        <div class="event__type-item">
-                          <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship">
-                          <label class="event__type-label  event__type-label--ship" for="event-type-ship-1">Ship</label>
-                        </div>
-
-                        <div class="event__type-item">
-                          <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive">
-                          <label class="event__type-label  event__type-label--drive" for="event-type-drive-1">Drive</label>
-                        </div>
-
-                        <div class="event__type-item">
-                          <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
-                          <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
-                        </div>
-
-                        <div class="event__type-item">
-                          <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in">
-                          <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-1">Check-in</label>
-                        </div>
-
-                        <div class="event__type-item">
-                          <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing">
-                          <label class="event__type-label  event__type-label--sightseeing" for="event-type-sightseeing-1">Sightseeing</label>
-                        </div>
-
-                        <div class="event__type-item">
-                          <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant">
-                          <label class="event__type-label  event__type-label--restaurant" for="event-type-restaurant-1">Restaurant</label>
-                        </div>
+                      ${pointTypeTemplate}
                       </fieldset>
                     </div>
                   </div>
@@ -138,33 +105,173 @@ function createEditingFormTemplate(point) {
 `;
 }
 
-export default class EditingFormView extends AbstractView {
-  #point = null;
+export default class EditingFormView extends AbstractStatefulView {
   #handleFormSubmit = null;
-  #handleEditClick = null;
+  #datepickerStart = null;
+  #datepickerEnd = null;
   #handleHideForm = null;
-  constructor({ point, onFormSubmit, onButtonClick, onFormHide }) {
+  constructor({ point, onFormSubmit, onFormHide }) {
     super();
-    this.#point = point;
+    this._setState(EditingFormView.parsePointToState(point));
+
     this.#handleFormSubmit = onFormSubmit;
-    this.#handleEditClick = onButtonClick;
+
     this.#handleHideForm = onFormHide;
 
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#resetButtonClick);
-    this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler);
+    this._restoreHandlers();
   }
 
   get template() {
-    return createEditingFormTemplate(this.#point);
+    return createEditingFormTemplate(this._state);
+  }
+
+  removeElement() {
+    super.removeElement();
+
+
+    if(this.#datepickerStart) {
+      this.#datepickerStart.destroy();
+      this.#datepickerStart = null;
+    }
+    if(this.#datepickerEnd) {
+      this.#datepickerEnd.destroy();
+      this.#datepickerEnd = null;
+    }
+  }
+
+  reset(point) {
+    this.updateElement(
+      EditingFormView.parseStateToPoint(point),
+    );
+  }
+
+  _restoreHandlers() {
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#resetButtonClick);
+    this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler);
+    this.element.querySelectorAll('.event__type-input').forEach((input) => {
+      input.addEventListener('click', this.#typeChangeHandler);
+    });
+
+    this.element.querySelectorAll('.event__input--destination').forEach((input) => {
+      input.addEventListener('change', this.#destinationChangeHandler);
+    });
+    this.element.querySelectorAll('.event__offer-checkbox').forEach((input) => {
+      input.addEventListener('click', this.#offersChangeHandler);
+    });
+    this.element.querySelectorAll('.event__input--price').forEach((input) => {
+      input.addEventListener('change', this.#priceChangeHandler);
+    });
+    this.#setDatepickers();
   }
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormSubmit(this.#point);
+    this.#handleFormSubmit(EditingFormView.parseStateToPoint(this._state));
   };
 
   #resetButtonClick = (evt) => {
     evt.preventDefault();
     this.#handleHideForm();
   };
+
+
+  #typeChangeHandler = (evt) => {
+    const target = evt.target;
+
+    const pointType = target.value;
+
+    this.updateElement({
+      type: pointType,
+      offers: []
+    });
+
+  };
+
+  #destinationChangeHandler = (evt) => {
+    evt.preventDefault();
+    const cityName = evt.target.value;
+    const destination = getDestinationByCityName(cityName);
+
+    if (destination) {
+      this.updateElement({
+        destinationID: destination.id
+      });
+    } else {
+      setSaveButtonDisabled();
+    }
+  };
+
+  #offersChangeHandler = (evt) => {
+    const offerId = Number(evt.target.id.slice(-1));
+    this.updateElement({
+      offers: this._state.offers.includes(offerId) ? this._state.offers.filter((id) => id !== offerId) : [...this._state.offers, offerId]
+    });
+  };
+
+  #priceChangeHandler = (evt) => {
+    evt.preventDefault();
+    const pointPrice = evt.target.value;
+
+    if (pointPrice > 0) {
+      this.updateElement({
+        price: pointPrice
+      });
+    } else {
+      setSaveButtonDisabled();
+    }
+  };
+
+  #closeDateStartHandler = ([date]) => {
+    this._setState({
+      point: {
+        ...this._state.point,
+        dateStart: date,
+      }
+    });
+    this.#datepickerEnd.set('minDate', this._state.dateStart);
+  };
+
+  #closeDateEndHandler = ([date]) => {
+    this._setState({
+      point: {
+        ...this._state.point,
+        dateEnd: date,
+      }
+    });
+    this.#datepickerStart.set('maxDate', this._state.dateEnd);
+  };
+
+  #setDatepickers = () => {
+    const [dateStartElement, dateEndElement] = this.element.querySelectorAll('.event__input--time');
+    const flatpickrConfig = {
+      dateFormat: 'd/m/y H:i',
+      enableTime: true,
+      locale: {
+        firstDayOfWeek: 1,
+      },
+      'time_24hr': true,
+    };
+
+    this.#datepickerStart = flatpickr(dateStartElement, {
+      ...flatpickrConfig,
+      defaultDate: this._state.dateStart,
+      onClose: this.#closeDateStartHandler,
+      maxDate: this._state.dateEnd,
+    });
+
+    this.#datepickerEnd = flatpickr(dateEndElement, {
+      ...flatpickrConfig,
+      defaultDate: this._state.dateEnd,
+      onClose: this.#closeDateEndHandler,
+      minDate: this._state.dateStart,
+    });
+  };
+
+  static parsePointToState(point) {
+    return { ...point };
+  }
+
+  static parseStateToPoint(state) {
+    return { ...state };
+  }
 }

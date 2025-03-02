@@ -52,4 +52,6 @@ const MINUTES = {
   MIN: 0,
   MAX: 59
 };
-export { PRICE, CITIES, HOUR, MINUTES };
+const POINT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
+
+export { PRICE, CITIES, HOUR, MINUTES, POINT_TYPES };
