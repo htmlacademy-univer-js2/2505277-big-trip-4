@@ -79,7 +79,7 @@ export default class PointPresenter {
   }
 
   #replaceFormToCard() {
-    const updatedPoint = EditingFormView.parseStateToPoint(this.#pointEditComponent._state);
+    const updatedPoint = this.#pointEditComponent.parseStateToPoint;
     this.#point = updatedPoint;
     this.#handleDataChange(updatedPoint);
     replace(this.#pointComponent, this.#pointEditComponent);

@@ -1,7 +1,7 @@
 import { humanizeEditingFormDate } from '../utils/date.js';
 import { getDestinationById, getOffersByType, getDestinationByCityName, setSaveButtonDisabled } from '../utils/mock.js';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { POINT_TYPES } from '../mock/const.js';
+import { POINT_TYPES,FLATPICKR_CONFIG } from '../mock/const.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
@@ -18,8 +18,8 @@ function createEditingFormTemplate(point) {
     .map((offer) => {
       const checked = point.offers.includes(offer.id) ? 'checked' : '';
       return `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-1" type="checkbox" name="event-offer-comfort" ${checked}>
-        <label class="event__offer-label" for="event-offer-comfort-1">
+        <input class="event__offer-checkbox  visually-hidden" id="${offer.id}" type="checkbox" name="event-offer-comfort" ${checked}>
+        <label class="event__offer-label" for="${offer.id}">
         <span class="event__offer-title">${offer.title}</span>
         &plus;&euro;&nbsp;
         <span class="event__offer-price">${offer.price}</span>
@@ -58,9 +58,17 @@ function createEditingFormTemplate(point) {
                     </label>
                     <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.cityName}" list="destination-list-1">
                     <datalist id="destination-list-1">
-                      <option value="Amsterdam"></option>
-                      <option value="Geneva"></option>
-                      <option value="Chamonix"></option>
+                      <option value="Los Angeles"></option>
+                      <option value="">New York</option>
+                      <option value="">Chicago</option>
+                      <option value="">Houston</option>
+                      <option value="">Phoenix</option>
+                      <option value="">Philadelphia</option>
+                      <option value="">San Antonio</option>
+                      <option value="">San Diego</option>
+                      <option value="">Dallas</option>
+                      <option value="San Francisco"></option>
+
                     </datalist>
                   </div>
 
@@ -105,14 +113,17 @@ function createEditingFormTemplate(point) {
 `;
 }
 
+
 export default class EditingFormView extends AbstractStatefulView {
   #handleFormSubmit = null;
   #datepickerStart = null;
   #datepickerEnd = null;
   #handleHideForm = null;
-  constructor({ point, onFormSubmit, onFormHide }) {
+
+
+  constructor({point, onFormSubmit, onFormHide }) {
     super();
-    this._setState(EditingFormView.parsePointToState(point));
+    this._setState({ ...point });
 
     this.#handleFormSubmit = onFormSubmit;
 
@@ -139,9 +150,9 @@ export default class EditingFormView extends AbstractStatefulView {
     }
   }
 
-  reset(point) {
+  reset() {
     this.updateElement(
-      EditingFormView.parseStateToPoint(point),
+      EditingFormView.parseStateToPoint,
     );
   }
 
@@ -166,7 +177,7 @@ export default class EditingFormView extends AbstractStatefulView {
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormSubmit(EditingFormView.parseStateToPoint(this._state));
+    this.#handleFormSubmit(this._state);
   };
 
   #resetButtonClick = (evt) => {
@@ -190,8 +201,8 @@ export default class EditingFormView extends AbstractStatefulView {
   #destinationChangeHandler = (evt) => {
     evt.preventDefault();
     const cityName = evt.target.value;
-    const destination = getDestinationByCityName(cityName);
 
+    const destination = getDestinationByCityName(cityName);
     if (destination) {
       this.updateElement({
         destinationID: destination.id
@@ -202,7 +213,7 @@ export default class EditingFormView extends AbstractStatefulView {
   };
 
   #offersChangeHandler = (evt) => {
-    const offerId = Number(evt.target.id.slice(-1));
+    const offerId = Number(evt.target.id);
     this.updateElement({
       offers: this._state.offers.includes(offerId) ? this._state.offers.filter((id) => id !== offerId) : [...this._state.offers, offerId]
     });
@@ -222,56 +233,48 @@ export default class EditingFormView extends AbstractStatefulView {
   };
 
   #closeDateStartHandler = ([date]) => {
-    this._setState({
+    this.updateElement({
       point: {
-        ...this._state.point,
-        dateStart: date,
+        startDate: date,
       }
     });
-    this.#datepickerEnd.set('minDate', this._state.dateStart);
+    this._setState({
+      point: {
+        startDate: date,
+      }
+    });
+    this.#datepickerEnd.set('minDate', this._state.startDate);
   };
 
   #closeDateEndHandler = ([date]) => {
     this._setState({
       point: {
-        ...this._state.point,
-        dateEnd: date,
+        endDate: date,
       }
     });
-    this.#datepickerStart.set('maxDate', this._state.dateEnd);
+    this.#datepickerStart.set('maxDate', this._state.endDate);
+
   };
 
   #setDatepickers = () => {
     const [dateStartElement, dateEndElement] = this.element.querySelectorAll('.event__input--time');
-    const flatpickrConfig = {
-      dateFormat: 'd/m/y H:i',
-      enableTime: true,
-      locale: {
-        firstDayOfWeek: 1,
-      },
-      'time_24hr': true,
-    };
-
     this.#datepickerStart = flatpickr(dateStartElement, {
-      ...flatpickrConfig,
-      defaultDate: this._state.dateStart,
+      ...FLATPICKR_CONFIG,
+      defaultDate: this._state.startDate,
       onClose: this.#closeDateStartHandler,
-      maxDate: this._state.dateEnd,
+      maxDate: this._state.endDate,
     });
 
     this.#datepickerEnd = flatpickr(dateEndElement, {
-      ...flatpickrConfig,
-      defaultDate: this._state.dateEnd,
+      ...FLATPICKR_CONFIG,
+      defaultDate: this._state.endDate,
       onClose: this.#closeDateEndHandler,
-      minDate: this._state.dateStart,
+      minDate: this._state.startDate,
     });
   };
 
-  static parsePointToState(point) {
-    return { ...point };
-  }
 
-  static parseStateToPoint(state) {
-    return { ...state };
+  get parseStateToPoint() {
+    return this._state;
   }
 }
