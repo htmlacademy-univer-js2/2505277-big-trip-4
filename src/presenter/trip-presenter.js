@@ -81,7 +81,7 @@ export default class TripPlannerPresenter {
     this.#renderSort();
     this.#renderFilter();
     this.#renderWaypointList();
-    this.#renderCreationForm();
+
     this.#points.forEach((point) => {
       this.#renderPoint(point);
     });
