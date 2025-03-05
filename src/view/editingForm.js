@@ -150,10 +150,8 @@ export default class EditingFormView extends AbstractStatefulView {
     }
   }
 
-  reset() {
-    this.updateElement(
-      EditingFormView.parseStateToPoint,
-    );
+  reset(point) {
+    this.updateElement(point);
   }
 
   _restoreHandlers() {
