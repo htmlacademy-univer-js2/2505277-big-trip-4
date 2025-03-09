@@ -1,7 +1,8 @@
 import { render, replace, remove } from '../framework/render';
 import WaypointView from '../view/waypoint';
 import EditingFormView from '../view/editingForm';
-
+import { UserAction,UpdateType } from '../mock/const';
+// import { isDatesEqual } from '../utils/date';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -32,7 +33,7 @@ export default class PointPresenter {
     this.#pointComponent = new WaypointView({
       point: this.#point,
       onButtonClick: this.#handleEditClick,
-      onFavoriteClick: this.#onHandleFavoriteClick,
+      onFavoriteClick: this.#handleFavoriteClick,
     });
 
     this.#pointEditComponent = new EditingFormView({
@@ -40,6 +41,7 @@ export default class PointPresenter {
       offers: this.#offers,
       onFormSubmit: this.#handleFormSubmit,
       onFormHide: this.#handleHideForm,
+      onDeleteClick: this.#handleDeleteClick,
     });
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
@@ -79,7 +81,7 @@ export default class PointPresenter {
   }
 
   #replaceFormToCard() {
-    const updatedPoint = this.#pointEditComponent.parseStateToPoint;
+    const updatedPoint = this.#pointEditComponent._state;
     this.#point = updatedPoint;
     this.#handleDataChange(updatedPoint);
     replace(this.#pointComponent, this.#pointEditComponent);
@@ -95,20 +97,29 @@ export default class PointPresenter {
     }
   };
 
-  #onHandleFavoriteClick = () => {
-    this.#handleDataChange({ ...this.#point, isFavorite: !this.#point.isFavorite });
+  #handleFavoriteClick = () => {
+    this.#handleDataChange(UserAction.UPDATE_TASK,UpdateType.MINOR,{ ...this.#point, isFavorite: !this.#point.isFavorite });
   };
 
   #handleEditClick = () => {
     this.#replaceCardToForm();
   };
 
-  #handleFormSubmit = (point) => {
-    this.#handleDataChange(point);
+  #handleFormSubmit = (update) => {
+
+
+    this.#handleDataChange(UserAction.UPDATE_TASK, UpdateType.PATCH,
+      update,);
     this.#replaceFormToCard();
   };
 
   #handleHideForm = () => {
     this.#replaceFormToCard();
+  };
+
+  #handleDeleteClick = (point)=> {
+    this.#handleDataChange(UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      point,);
   };
 }

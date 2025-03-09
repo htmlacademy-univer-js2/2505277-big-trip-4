@@ -119,14 +119,14 @@ export default class EditingFormView extends AbstractStatefulView {
   #datepickerStart = null;
   #datepickerEnd = null;
   #handleHideForm = null;
+  #handleDeleteClick = null;
 
-
-  constructor({point, onFormSubmit, onFormHide }) {
+  constructor({point, onFormSubmit, onFormHide, onDeleteClick }) {
     super();
     this._setState({ ...point });
 
     this.#handleFormSubmit = onFormSubmit;
-
+    this.#handleDeleteClick = onDeleteClick;
     this.#handleHideForm = onFormHide;
 
     this._restoreHandlers();
@@ -170,12 +170,13 @@ export default class EditingFormView extends AbstractStatefulView {
     this.element.querySelectorAll('.event__input--price').forEach((input) => {
       input.addEventListener('change', this.#priceChangeHandler);
     });
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formDeleteClickHandler);
     this.#setDatepickers();
   }
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormSubmit(this._state);
+    this.#handleFormSubmit(this._state.point);
   };
 
   #resetButtonClick = (evt) => {
@@ -223,6 +224,7 @@ export default class EditingFormView extends AbstractStatefulView {
 
     if (pointPrice > 0) {
       this.updateElement({
+        ...this._state.point,
         price: pointPrice
       });
     } else {
@@ -231,20 +233,32 @@ export default class EditingFormView extends AbstractStatefulView {
   };
 
   #closeDateStartHandler = ([date]) => {
+
     if (date <= this._state.endDate) {
-      this.updateElement({
-        startDate: date,
+      this._setState({
+        point: {
+          ...this._state.point,
+          startDate: date,
+        }
       });
+      this.#datepickerEnd.set('minDate', this._state.startDate);
     } else {
       setSaveButtonDisabled();
     }
+
   };
 
   #closeDateEndHandler = ([date]) => {
-    if (date >= this._state.startDate) {
-      this.updateElement({
-        endDate: date,
+    if (date >= this._state.startDate){
+
+      this._setState({
+        point: {
+          ...this._state.point,
+          endDate: date,
+        }
       });
+
+      this.#datepickerStart.set('maxDate', this._state.endDate);
     } else {
       setSaveButtonDisabled();
     }
@@ -255,19 +269,23 @@ export default class EditingFormView extends AbstractStatefulView {
 
     this.#datepickerStart = flatpickr(dateStartElement, {
       ...FLATPICKR_CONFIG,
-      defaultDate: this._state.dateStart,
-      onClose: this.#closeDateStartHandler,
-      maxDate: this._state.dateEnd,
+      defaultDate: this._state.startDate,
+      onChange: this.#closeDateStartHandler,
+      maxDate: this._state.endDate,
     });
 
     this.#datepickerEnd = flatpickr(dateEndElement, {
       ...FLATPICKR_CONFIG,
-      defaultDate: this._state.dateEnd,
-      onClose: this.#closeDateEndHandler,
-      minDate: this._state.dateStart,
+      defaultDate: this._state.endDate,
+      onChange: this.#closeDateEndHandler,
+      minDate: this._state.startDate,
     });
   };
 
+  #formDeleteClickHandler = (evt) =>{
+    evt.preventDefault();
+    this.#handleDeleteClick(this._state);
+  };
 
   get parseStateToPoint() {
     return this._state;
