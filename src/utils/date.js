@@ -46,4 +46,9 @@ function getRandomStartDate(date, startHour, startMinutes) {
 function getRandomEndDate(date, startHour, startMinutes, MINUTES) {
   return `2019-${date} ${addNull(getRandomInt(startHour + 1, 23))}:${addNull(getRandomInt(startMinutes + 1, MINUTES.MAX))}`;
 }
-export { getDateDifference, getDate, humanizeEditingFormDate, humanizePointDate, addNull, getRandomStartDate, getRandomEndDate };
+
+function isDatesEqual(dateA, dateB) {
+  return (dateA === null && dateB === null) || dayjs(dateA).isSame(dateB, 'D');
+}
+
+export { getDateDifference, getDate, humanizeEditingFormDate, humanizePointDate, addNull, getRandomStartDate, getRandomEndDate,isDatesEqual };
