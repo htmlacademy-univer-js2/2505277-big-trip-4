@@ -83,7 +83,7 @@ export default class PointPresenter {
   #replaceFormToCard() {
     const updatedPoint = this.#pointEditComponent._state;
     this.#point = updatedPoint;
-    this.#handleDataChange(updatedPoint);
+    this.#handleDataChange(UserAction.UPDATE_POINT,UpdateType.PATCH,updatedPoint);
     replace(this.#pointComponent, this.#pointEditComponent);
     document.removeEventListener('keydown', this.#escKeyDownHandler);
     this.#mode = Mode.DEFAULT;
@@ -106,8 +106,6 @@ export default class PointPresenter {
   };
 
   #handleFormSubmit = (update) => {
-
-
     this.#handleDataChange(UserAction.UPDATE_TASK, UpdateType.PATCH,
       update,);
     this.#replaceFormToCard();

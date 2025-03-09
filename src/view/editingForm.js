@@ -233,48 +233,29 @@ export default class EditingFormView extends AbstractStatefulView {
   };
 
   #closeDateStartHandler = ([date]) => {
-
-    if (date <= this._state.endDate) {
-      this._setState({
-        point: {
-          ...this._state.point,
-          startDate: date,
-        }
-      });
-      this.#datepickerEnd.set('minDate', this._state.startDate);
-    } else {
-      setSaveButtonDisabled();
-    }
-
+    this.updateElement({
+      startDate: date,
+    });
   };
 
   #closeDateEndHandler = ([date]) => {
-    if (date >= this._state.startDate){
+    this.updateElement({
 
-      this._setState({
-        point: {
-          ...this._state.point,
-          endDate: date,
-        }
-      });
+      endDate: date,
 
-      this.#datepickerStart.set('maxDate', this._state.endDate);
-    } else {
-      setSaveButtonDisabled();
-    }
+    });
   };
 
   #setDatepickers = () => {
-    const [dateStartElement, dateEndElement] = this.element.querySelectorAll('.event__input--time');
 
-    this.#datepickerStart = flatpickr(dateStartElement, {
+    this.#datepickerStart = flatpickr(this.element.querySelector('#event-start-time-1'), {
       ...FLATPICKR_CONFIG,
       defaultDate: this._state.startDate,
       onChange: this.#closeDateStartHandler,
       maxDate: this._state.endDate,
     });
 
-    this.#datepickerEnd = flatpickr(dateEndElement, {
+    this.#datepickerEnd = flatpickr(this.element.querySelector('#event-end-time-1'), {
       ...FLATPICKR_CONFIG,
       defaultDate: this._state.endDate,
       onChange: this.#closeDateEndHandler,
