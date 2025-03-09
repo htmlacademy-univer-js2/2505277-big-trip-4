@@ -15,13 +15,36 @@ const siteMainElement = document.querySelector('.page-main');
 const siteContainerElement = siteMainElement.querySelector(
   '.page-body__container'
 );
+const filters = [
+  {
+    type: 'everything',
+
+  },
+  {
+    type: 'future',
+
+  },
+  {
+    type: 'present',
+
+  },
+  {
+    type: 'past',
+
+  },
+];
 
 export default class TripPlannerPresenter {
   #TripPlannerContainer = null;
   #pointModel = null;
   #sortComponent = new SortingView();
   #tripInfoView = new TripInfoView();
-  #filterView = new FilterView();
+  #filterView = new FilterView({
+    filters,
+    currentFilterType: 'everything',
+    onFilterTypeChange: () => {}
+  });
+
   #creationForm = new CreationFormView();
   #renderedPointCount = POINT_COUNT_PER_STEP;
   #pointPresenters = new Map();

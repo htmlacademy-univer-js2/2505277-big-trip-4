@@ -72,4 +72,10 @@ const UpdateType = {
   MINOR:'MINOR',
   MAJOR:'MAJOR',
 };
-export { PRICE, CITIES, HOUR, MINUTES, POINT_TYPES, FLATPICKR_CONFIG,UserAction,UpdateType};
+const FilterType = {
+  EVERYTHING:'everything',
+  FUTURE:'future',
+  PRESENT:'present',
+  PAST:'past',
+};
+export { PRICE, CITIES, HOUR, MINUTES, POINT_TYPES, FLATPICKR_CONFIG,UserAction,UpdateType,FilterType};
