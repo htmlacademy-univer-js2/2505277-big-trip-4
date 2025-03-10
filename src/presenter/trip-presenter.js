@@ -88,7 +88,7 @@ export default class TripPlannerPresenter {
     points.forEach((point)=>this.#renderPoint(point));
     if (this.points.length === 0) {
       this.#renderNoPoints();
-      return;
+
     }
   }
 
