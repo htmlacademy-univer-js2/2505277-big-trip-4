@@ -2,6 +2,7 @@ import AbstractView from '../framework/view/abstract-view.js';
 
 function createFilterItemTemplate(filter, currentFilterType) {
   const {type} = filter;
+
   return ` <div class="trip-filters__filter">
                   <input
                     id="filter-${type}"
