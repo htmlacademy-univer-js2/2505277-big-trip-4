@@ -27,16 +27,27 @@ function getDate() {
 
 function getDateDifference(startDate, endDate) {
   const dateDifferenceInMinutes = dayjs(endDate).diff(dayjs(startDate), 'minute');
-  const hours = Math.floor(dateDifferenceInMinutes / 60);
+  const dateDifferenceInHours = dayjs(endDate).diff(dayjs(startDate), 'hour');
+
+  const days = Math.floor(dateDifferenceInHours / 24);
+  const hours = Math.floor(dateDifferenceInMinutes / 60) - days * 24;
   const minutes = dateDifferenceInMinutes % 60;
 
-  if (dateDifferenceInMinutes < 60) {
-    return `${minutes}M`;
-  } else if (minutes === 0) {
-    return `${hours}H`;
-  } else {
-    return `${hours}H ${minutes}M`;
+  let result = '';
+
+  if (dateDifferenceInHours > 24) {
+    result += `${days}D `;
   }
+
+  if (dateDifferenceInHours > 0) {
+    result += `${hours}H `;
+  }
+
+  if (dateDifferenceInMinutes >= 60 || (result === '' && minutes > 0)) {
+    result += `${minutes}M`;
+  }
+
+  return result.trim();
 }
 
 function getRandomStartDate(date, startHour, startMinutes) {
