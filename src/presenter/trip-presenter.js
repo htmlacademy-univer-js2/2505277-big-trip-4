@@ -2,7 +2,7 @@ import { RenderPosition } from '../render.js';
 import { render } from '../framework/render.js';
 import CreationFormView from '../view/creationForm.js';
 import SortingView from '../view/sorting.js';
-import FilterView from '../view/filters.js';
+
 import WaypointListView from '../view/waypointList.js';
 import TripInfoView from '../view/tripInfoView.js';
 import PointPresenter from './point-presenter.js';
@@ -15,35 +15,13 @@ const siteMainElement = document.querySelector('.page-main');
 const siteContainerElement = siteMainElement.querySelector(
   '.page-body__container'
 );
-const filters = [
-  {
-    type: 'everything',
-
-  },
-  {
-    type: 'future',
-
-  },
-  {
-    type: 'present',
-
-  },
-  {
-    type: 'past',
-
-  },
-];
 
 export default class TripPlannerPresenter {
   #TripPlannerContainer = null;
   #pointModel = null;
   #sortComponent = new SortingView();
   #tripInfoView = new TripInfoView();
-  #filterView = new FilterView({
-    filters,
-    currentFilterType: 'everything',
-    onFilterTypeChange: () => {}
-  });
+
 
   #creationForm = new CreationFormView();
   #renderedPointCount = POINT_COUNT_PER_STEP;
@@ -83,9 +61,6 @@ export default class TripPlannerPresenter {
     render(this.#tripInfoView, tripMain, RenderPosition.AFTERBEGIN);
   }
 
-  #renderFilter() {
-    render(this.#filterView, tripMain, RenderPosition.BEFOREEND);
-  }
 
   #renderPoint(point) {
     const pointPresenter = new PointPresenter({
@@ -145,11 +120,11 @@ export default class TripPlannerPresenter {
     const pointCount = points.length;
     this.#renderTripInfo();
     this.#renderSort();
-    this.#renderFilter();
+
     this.#renderWaypointList();
 
     this.#renderPoints(points.slice(0,Math.min(pointCount, this.#renderedPointCount)));
   }
 }
 
-export { TripPlannerPresenter, siteContainerElement };
+export { TripPlannerPresenter, siteContainerElement,tripMain };

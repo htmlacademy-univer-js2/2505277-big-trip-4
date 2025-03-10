@@ -28,7 +28,6 @@ function getDate() {
 function getDateDifference(startDate, endDate) {
   const dateDifferenceInMinutes = dayjs(endDate).diff(dayjs(startDate), 'minute');
   const dateDifferenceInHours = dayjs(endDate).diff(dayjs(startDate), 'hour');
-
   const days = Math.floor(dateDifferenceInHours / 24);
   const hours = Math.floor(dateDifferenceInMinutes / 60) - days * 24;
   const minutes = dateDifferenceInMinutes % 60;
@@ -51,15 +50,23 @@ function getDateDifference(startDate, endDate) {
 }
 
 function getRandomStartDate(date, startHour, startMinutes) {
-  return `2019-${date} ${addNull(startHour)}:${addNull(startMinutes)}`;
+  return `2025-${date} ${addNull(startHour)}:${addNull(startMinutes)}`;
 }
 
 function getRandomEndDate(date, startHour, startMinutes, MINUTES) {
-  return `2019-${date} ${addNull(getRandomInt(startHour + 1, 23))}:${addNull(getRandomInt(startMinutes + 1, MINUTES.MAX))}`;
+  return `2025-${date} ${addNull(getRandomInt(startHour + 1, 23))}:${addNull(getRandomInt(startMinutes + 1, MINUTES.MAX))}`;
 }
 
 function isDatesEqual(dateA, dateB) {
   return (dateA === null && dateB === null) || dayjs(dateA).isSame(dateB, 'D');
 }
-
-export { getDateDifference, getDate, humanizeEditingFormDate, humanizePointDate, addNull, getRandomStartDate, getRandomEndDate,isDatesEqual };
+function isDateBefore(dueDate){
+  return dueDate && dayjs().isBefore(dayjs(dueDate,'D'));
+}
+function isDateAfter(dueDate){
+  return dueDate && dayjs(dueDate).isSame(dayjs(), 'D');
+}
+function isDateToday(dueDate){
+  return dueDate && dayjs().isSame(dayjs(dueDate,'D'));
+}
+export { getDateDifference, getDate, humanizeEditingFormDate, humanizePointDate, addNull, getRandomStartDate, getRandomEndDate,isDatesEqual,isDateBefore,isDateAfter,isDateToday };
