@@ -9,7 +9,7 @@ const filterContainer = document.querySelector('.trip-controls__filters');
 const pointModel = new PointsModel();
 const filterModel = new FilterModel();
 const tripPlannerPresenter = new TripPlannerPresenter({
-  TripPlannerContainer: siteContainerElement, pointModel
+  TripPlannerContainer: siteContainerElement, filterModel,pointModel
 });
 const filterPresenter = new FilterPresenter({
   filterContainer: filterContainer,

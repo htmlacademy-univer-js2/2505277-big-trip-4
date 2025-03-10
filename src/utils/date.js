@@ -57,9 +57,6 @@ function getRandomEndDate(date, startHour, startMinutes, MINUTES) {
   return `2025-${date} ${addNull(getRandomInt(startHour + 1, 23))}:${addNull(getRandomInt(startMinutes + 1, MINUTES.MAX))}`;
 }
 
-function isDatesEqual(dateA, dateB) {
-  return (dateA === null && dateB === null) || dayjs(dateA).isSame(dateB, 'D');
-}
 function isDateBefore(dueDate){
   return dueDate && dayjs().isBefore(dayjs(dueDate,'D'));
 }
@@ -69,4 +66,4 @@ function isDateAfter(dueDate){
 function isDateToday(dueDate){
   return dueDate && dayjs().isSame(dayjs(dueDate,'D'));
 }
-export { getDateDifference, getDate, humanizeEditingFormDate, humanizePointDate, addNull, getRandomStartDate, getRandomEndDate,isDatesEqual,isDateBefore,isDateAfter,isDateToday };
+export { getDateDifference, getDate, humanizeEditingFormDate, humanizePointDate, addNull, getRandomStartDate, getRandomEndDate,isDateBefore,isDateAfter,isDateToday };

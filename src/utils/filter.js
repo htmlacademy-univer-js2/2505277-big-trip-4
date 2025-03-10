@@ -1,5 +1,5 @@
 import { FilterType } from '../mock/const';
-import { isDateBefore,isDateAfter,isDateToday } from './date';
+import { isDateBefore,isDateToday,isDateAfter } from './date';
 
 const filter = {
   [FilterType.EVERYTHING]: (points) => points.filter((point) => point),

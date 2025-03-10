@@ -1,13 +1,15 @@
 import { RenderPosition } from '../render.js';
-import { render } from '../framework/render.js';
+import { render,remove } from '../framework/render.js';
 import CreationFormView from '../view/creationForm.js';
 import SortingView from '../view/sorting.js';
-
+import { filter } from '../utils/filter.js';
 import WaypointListView from '../view/waypointList.js';
 import TripInfoView from '../view/tripInfoView.js';
 import PointPresenter from './point-presenter.js';
-
+import { FilterType } from '../mock/const.js';
 import { UserAction ,UpdateType} from '../mock/const.js';
+import NoPointView from '../view/noPointView.js';
+
 const POINT_COUNT_PER_STEP = 8;
 const header = document.querySelector('.page-header');
 const tripMain = header.querySelector('.trip-main');
@@ -21,29 +23,39 @@ export default class TripPlannerPresenter {
   #pointModel = null;
   #sortComponent = new SortingView();
   #tripInfoView = new TripInfoView();
-
-
+  #filterModel = null;
+  #noPointComponent = null;
   #creationForm = new CreationFormView();
   #renderedPointCount = POINT_COUNT_PER_STEP;
   #pointPresenters = new Map();
-
-  constructor({ TripPlannerContainer, pointModel }) {
+  #filterType = FilterType.EVERYTHING;
+  constructor({ TripPlannerContainer, pointModel,filterModel }) {
     this.#TripPlannerContainer = TripPlannerContainer;
     this.#pointModel = pointModel;
-
+    this.#filterModel = filterModel;
     this.#pointModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   #listComponent = new WaypointListView();
 
   get points(){
-    return [...this.#pointModel.points];
+    this.#filterType = this.#filterModel.filter;
+    const points = this.#pointModel.points;
+    const filteredPoints = filter[this.#filterType](points);
+    return filteredPoints;
   }
 
   init() {
     this.#renderTrip();
   }
 
+  #renderNoPoints() {
+    this.#noPointComponent = new NoPointView({
+      filterType: this.#filterType
+    });
+    render(this.#noPointComponent, this.#listComponent.element, RenderPosition.AFTERBEGIN);
+  }
 
   #renderCreationForm() {
     render(this.#creationForm, this.#listComponent.element);
@@ -74,6 +86,10 @@ export default class TripPlannerPresenter {
 
   #renderPoints(points){
     points.forEach((point)=>this.#renderPoint(point));
+    if (this.points.length === 0) {
+      this.#renderNoPoints();
+      return;
+    }
   }
 
   #handleModeChange = () => {
@@ -111,7 +127,9 @@ export default class TripPlannerPresenter {
 
     this.#pointPresenters.forEach((presenter)=> presenter.destroy());
     this.#pointPresenters.clear();
-
+    if (this.#noPointComponent) {
+      remove(this.#noPointComponent);
+    }
     this.#renderedPointCount = Math.min(pointCount, this.#renderedPointCount);
   }
 
