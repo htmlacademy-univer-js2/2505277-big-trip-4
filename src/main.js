@@ -42,4 +42,4 @@ function handleNewPointButtonClick() {
 render(newPointButtonComponent, tripMain);
 filterPresenter.init();
 tripPlannerPresenter.init();
-
+pointsModel.init();
