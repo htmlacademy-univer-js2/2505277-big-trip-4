@@ -1,7 +1,7 @@
 import { render, replace, remove } from '../framework/render';
 import WaypointView from '../view/waypoint';
 import EditingFormView from '../view/editingForm';
-import { UserAction,UpdateType } from '../mock/const';
+import { UserAction, UpdateType } from '../mock/const';
 // import { isDatesEqual } from '../utils/date';
 
 const Mode = {
@@ -18,8 +18,8 @@ export default class PointPresenter {
   #mode = Mode.DEFAULT;
   #offers = null;
   #point = null;
-  constructor({ listComponent, onDataChange, onModeChange, offers }) {
-    this.#offers = offers;
+  constructor({ listComponent, onDataChange, onModeChange }) {
+
     this.#listComponent = listComponent;
     this.#handleDataChange = onDataChange;
     this.#handleModeChange = onModeChange;
@@ -35,7 +35,6 @@ export default class PointPresenter {
       onButtonClick: this.#handleEditClick,
       onFavoriteClick: this.#handleFavoriteClick,
     });
-
     this.#pointEditComponent = new EditingFormView({
       point: this.#point,
       offers: this.#offers,
@@ -43,6 +42,7 @@ export default class PointPresenter {
       onFormHide: this.#handleHideForm,
       onDeleteClick: this.#handleDeleteClick,
     });
+
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
       render(this.#pointComponent, this.#listComponent);
@@ -83,7 +83,7 @@ export default class PointPresenter {
   #replaceFormToCard() {
     const updatedPoint = this.#pointEditComponent._state;
     this.#point = updatedPoint;
-    this.#handleDataChange(UserAction.UPDATE_POINT,UpdateType.PATCH,updatedPoint);
+    this.#handleDataChange(UserAction.UPDATE_POINT, UpdateType.PATCH, updatedPoint);
     replace(this.#pointComponent, this.#pointEditComponent);
     document.removeEventListener('keydown', this.#escKeyDownHandler);
     this.#mode = Mode.DEFAULT;
@@ -98,7 +98,7 @@ export default class PointPresenter {
   };
 
   #handleFavoriteClick = () => {
-    this.#handleDataChange(UserAction.UPDATE_TASK,UpdateType.MINOR,{ ...this.#point, isFavorite: !this.#point.isFavorite });
+    this.#handleDataChange(UserAction.UPDATE_TASK, UpdateType.MINOR, { ...this.#point, isFavorite: !this.#point.isFavorite });
   };
 
   #handleEditClick = () => {
@@ -115,7 +115,7 @@ export default class PointPresenter {
     this.#replaceFormToCard();
   };
 
-  #handleDeleteClick = (point)=> {
+  #handleDeleteClick = (point) => {
     this.#handleDataChange(UserAction.DELETE_POINT,
       UpdateType.MINOR,
       point,);

@@ -1,5 +1,5 @@
 import { RenderPosition } from '../render.js';
-import { render,remove } from '../framework/render.js';
+import { render, remove } from '../framework/render.js';
 import CreationFormView from '../view/creationForm.js';
 import SortingView from '../view/sorting.js';
 import { filter } from '../utils/filter.js';
@@ -7,10 +7,11 @@ import WaypointListView from '../view/waypointList.js';
 import TripInfoView from '../view/tripInfoView.js';
 import PointPresenter from './point-presenter.js';
 import { FilterType } from '../mock/const.js';
-import { UserAction ,UpdateType} from '../mock/const.js';
+import { UserAction, UpdateType } from '../mock/const.js';
 import NoPointView from '../view/noPointView.js';
+import NewPointPresenter from './new-point-presenter.js';
 
-const POINT_COUNT_PER_STEP = 8;
+const POINT_COUNT_PER_STEP = 5;
 const header = document.querySelector('.page-header');
 const tripMain = header.querySelector('.trip-main');
 const siteMainElement = document.querySelector('.page-main');
@@ -20,7 +21,7 @@ const siteContainerElement = siteMainElement.querySelector(
 
 export default class TripPlannerPresenter {
   #TripPlannerContainer = null;
-  #pointModel = null;
+  #pointsModel = null;
   #sortComponent = new SortingView();
   #tripInfoView = new TripInfoView();
   #filterModel = null;
@@ -28,26 +29,44 @@ export default class TripPlannerPresenter {
   #creationForm = new CreationFormView();
   #renderedPointCount = POINT_COUNT_PER_STEP;
   #pointPresenters = new Map();
+  #newPointPresenter = null;
+  #point = null;
   #filterType = FilterType.EVERYTHING;
-  constructor({ TripPlannerContainer, pointModel,filterModel }) {
+  #listComponent = new WaypointListView();
+  constructor({ TripPlannerContainer, pointsModel, filterModel, onNewPointDestroy }) {
     this.#TripPlannerContainer = TripPlannerContainer;
-    this.#pointModel = pointModel;
+    this.#pointsModel = pointsModel;
     this.#filterModel = filterModel;
-    this.#pointModel.addObserver(this.#handleModelEvent);
+
+    this.#newPointPresenter = new NewPointPresenter({
+      listComponent: this.#listComponent.element,
+      onDataChange: this.#handleViewAction,
+      onDestroy: onNewPointDestroy
+    });
+    this.#pointsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
-  #listComponent = new WaypointListView();
 
-  get points(){
+  get points() {
     this.#filterType = this.#filterModel.filter;
-    const points = this.#pointModel.points;
+    const points = this.#pointsModel.points;
     const filteredPoints = filter[this.#filterType](points);
     return filteredPoints;
   }
 
   init() {
     this.#renderTrip();
+  }
+
+  createPoint() {
+
+    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    const pointCount = this.points.length;
+    const points = this.points.slice(0, Math.min(pointCount, this.#renderedPointCount));
+
+    points.forEach((point) => this.#newPointPresenter.init(point, point.offers));
+
   }
 
   #renderNoPoints() {
@@ -66,6 +85,7 @@ export default class TripPlannerPresenter {
   }
 
   #renderSort() {
+
     render(this.#sortComponent, this.#TripPlannerContainer);
   }
 
@@ -80,38 +100,40 @@ export default class TripPlannerPresenter {
       onDataChange: this.#handleViewAction,
       onModeChange: this.#handleModeChange
     });
+
+
     pointPresenter.init(point);
     this.#pointPresenters.set(point.id, pointPresenter);
   }
 
-  #renderPoints(points){
-    points.forEach((point)=>this.#renderPoint(point));
+  #renderPoints(points) {
+    points.forEach((point) => this.#renderPoint(point));
     if (this.points.length === 0) {
       this.#renderNoPoints();
-
     }
   }
 
   #handleModeChange = () => {
+    this.#newPointPresenter.destroy();
     this.#pointPresenters.forEach((presenter) => presenter.resetView());
   };
 
-  #handleViewAction = (actionType,updatedType,update) => {
-    switch(actionType){
+  #handleViewAction = (actionType, updatedType, update) => {
+    switch (actionType) {
       case UserAction.UPDATE_POINT:
-        this.#pointModel.updatePoint(updatedType,update);
+        this.#pointsModel.updatePoint(updatedType, update);
         break;
       case UserAction.DELETE_POINT:
-        this.#pointModel.deletePoint(updatedType,update);
+        this.#pointsModel.deletePoint(updatedType, update);
         break;
       case UserAction.ADD_POINT:
-        this.#pointModel.addPoint(updatedType,update);
+        this.#pointsModel.addPoint(updatedType, update);
         break;
     }
   };
 
-  #handleModelEvent = (updatedType,data)=>{
-    switch(updatedType){
+  #handleModelEvent = (updatedType, data) => {
+    switch (updatedType) {
       case UpdateType.PATCH:
         this.#pointPresenters.get(data.id).init(data);
         break;
@@ -119,30 +141,38 @@ export default class TripPlannerPresenter {
         this.#clearTripPlan();
         this.#renderTrip();
         break;
+      case UpdateType.MAJOR:
+        this.#clearTripPlan();
+        this.#renderTrip();
+        break;
     }
   };
 
-  #clearTripPlan(){
+  #clearTripPlan({ resetRenderedPointCount = false } = {}) {
     const pointCount = this.points.length;
-
-    this.#pointPresenters.forEach((presenter)=> presenter.destroy());
+    this.#newPointPresenter.destroy();
+    this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();
     if (this.#noPointComponent) {
       remove(this.#noPointComponent);
     }
-    this.#renderedPointCount = Math.min(pointCount, this.#renderedPointCount);
+    if (resetRenderedPointCount) {
+      this.#renderedPointCount = POINT_COUNT_PER_STEP;
+    } else {
+
+      this.#renderedPointCount = Math.min(pointCount, this.#renderedPointCount);
+    }
+
   }
 
   #renderTrip() {
     const points = this.points;
-    const pointCount = points.length;
     this.#renderTripInfo();
     this.#renderSort();
-
     this.#renderWaypointList();
 
-    this.#renderPoints(points.slice(0,Math.min(pointCount, this.#renderedPointCount)));
+    this.#renderPoints(points);
   }
 }
 
-export { TripPlannerPresenter, siteContainerElement,tripMain };
+export { TripPlannerPresenter, siteContainerElement, tripMain };

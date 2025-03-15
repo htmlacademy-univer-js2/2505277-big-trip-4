@@ -78,4 +78,6 @@ const FilterType = {
   PRESENT:'present',
   PAST:'past',
 };
+
+
 export { PRICE, CITIES, HOUR, MINUTES, POINT_TYPES, FLATPICKR_CONFIG,UserAction,UpdateType,FilterType};

@@ -1,7 +1,7 @@
 import { humanizeEditingFormDate } from '../utils/date.js';
 import { getDestinationById, getOffersByType, getDestinationByCityName, setSaveButtonDisabled } from '../utils/mock.js';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { POINT_TYPES,FLATPICKR_CONFIG } from '../mock/const.js';
+import { POINT_TYPES, FLATPICKR_CONFIG } from '../mock/const.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
@@ -120,11 +120,11 @@ export default class EditingFormView extends AbstractStatefulView {
   #datepickerEnd = null;
   #handleHideForm = null;
   #handleDeleteClick = null;
-
-  constructor({point, onFormSubmit, onFormHide, onDeleteClick }) {
+  #offers = null;
+  constructor({ point, offers, onFormSubmit, onFormHide, onDeleteClick }) {
     super();
     this._setState({ ...point });
-
+    this.#offers = offers;
     this.#handleFormSubmit = onFormSubmit;
     this.#handleDeleteClick = onDeleteClick;
     this.#handleHideForm = onFormHide;
@@ -133,18 +133,18 @@ export default class EditingFormView extends AbstractStatefulView {
   }
 
   get template() {
-    return createEditingFormTemplate(this._state);
+    return createEditingFormTemplate(this._state, this.#offers);
   }
 
   removeElement() {
     super.removeElement();
 
 
-    if(this.#datepickerStart) {
+    if (this.#datepickerStart) {
       this.#datepickerStart.destroy();
       this.#datepickerStart = null;
     }
-    if(this.#datepickerEnd) {
+    if (this.#datepickerEnd) {
       this.#datepickerEnd.destroy();
       this.#datepickerEnd = null;
     }
@@ -176,7 +176,7 @@ export default class EditingFormView extends AbstractStatefulView {
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormSubmit(this._state.point);
+    this.#handleFormSubmit(this._state);
   };
 
   #resetButtonClick = (evt) => {
@@ -240,9 +240,7 @@ export default class EditingFormView extends AbstractStatefulView {
 
   #closeDateEndHandler = ([date]) => {
     this.updateElement({
-
       endDate: date,
-
     });
   };
 
@@ -263,7 +261,7 @@ export default class EditingFormView extends AbstractStatefulView {
     });
   };
 
-  #formDeleteClickHandler = (evt) =>{
+  #formDeleteClickHandler = (evt) => {
     evt.preventDefault();
     this.#handleDeleteClick(this._state);
   };
