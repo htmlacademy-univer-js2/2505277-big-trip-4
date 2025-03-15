@@ -8,10 +8,13 @@ import FilterPresenter from './presenter/filter-presenter.js';
 import NewPointButtonView from './view/newPointButtonView.js';
 import { tripMain } from './presenter/trip-presenter.js';
 import { render } from './framework/render.js';
+import PointsApiService from './points-api-service.js';
 
+const AUTHORIZATION = 'Basic hS2sfS44wcl1sa2j';
+const END_POINT = 'https://21.objects.htmlacademy.pro/big-trip';
 
 const filterContainer = document.querySelector('.trip-controls__filters');
-const pointsModel = new PointsModel();
+const pointsModel = new PointsModel({ pointsApiService: new PointsApiService(END_POINT, AUTHORIZATION) });
 const filterModel = new FilterModel();
 
 const tripPlannerPresenter = new TripPlannerPresenter({

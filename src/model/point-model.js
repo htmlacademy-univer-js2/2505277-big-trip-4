@@ -5,6 +5,18 @@ const POINT_COUNT = 5;
 
 export default class PointsModel extends Observable {
   #points = Array.from({ length: POINT_COUNT }, getRandomPoint);
+  #pointsApiService = null;
+
+  constructor({ pointsApiService }) {
+    super();
+
+    this.#pointsApiService = pointsApiService;
+
+    this.#pointsApiService.getPoints().then((points) => {
+      console.log(points);
+    });
+  }
+
   get points() {
     return this.#points;
   }
