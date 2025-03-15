@@ -77,7 +77,6 @@ export default class PointPresenter {
     document.addEventListener('keydown', this.#escKeyDownHandler);
     this.#handleModeChange();
     this.#mode = Mode.EDITING;
-
   }
 
   #replaceFormToCard() {
