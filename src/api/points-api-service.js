@@ -1,4 +1,4 @@
-import ApiService from './framework/api-service';
+import ApiService from '../framework/api-service';
 
 const Method = {
   GET: 'GET',
@@ -8,16 +8,8 @@ const Method = {
 };
 
 export default class PointsApiService extends ApiService {
-  getPoints() {
+  get points() {
     return this._load({ url: 'points' }).then(ApiService.parseResponse);
-  }
-
-  getDestinations() {
-    return this._load({ url: 'destinations' }).then(ApiService.parseResponse);
-  }
-
-  getOffers() {
-    return this._load({ url: 'offers' }).then(ApiService.parseResponse);
   }
 
   async updatePoint(update) {

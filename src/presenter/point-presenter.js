@@ -15,8 +15,12 @@ export default class PointPresenter {
   #pointComponent = null;
   #pointEditComponent = null;
   #mode = Mode.DEFAULT;
+  #isPointSaving = true;
+  #isEventEditing = false;
+  #isOtherFormOpen = false;
   #offers = null;
   #point = null;
+  #destinations = null;
   constructor({ listComponent, onDataChange, onModeChange }) {
 
     this.#listComponent = listComponent;
@@ -24,20 +28,25 @@ export default class PointPresenter {
     this.#handleModeChange = onModeChange;
   }
 
-  init(point) {
+  init(point, destinations, offers) {
     this.#point = point;
+    this.#offers = offers;
+    this.#destinations = destinations;
 
     const prevPointComponent = this.#pointComponent;
     const prevPointEditComponent = this.#pointEditComponent;
     this.#pointComponent = new WaypointView({
       point: this.#point,
+      destinations: this.#destinations,
+      offers: this.#offers,
       onButtonClick: this.#handleEditClick,
       onFavoriteClick: this.#handleFavoriteClick,
     });
     this.#pointEditComponent = new EditingFormView({
       point: this.#point,
+      destinations: this.#destinations,
       offers: this.#offers,
-      onFormSubmit: this.#handleFormSubmit,
+      onFormSubmit: async () => this.#replaceFormToCard(),
       onFormHide: this.#handleHideForm,
       onDeleteClick: this.#handleDeleteClick,
     });
@@ -67,22 +76,44 @@ export default class PointPresenter {
   resetView() {
     if (this.#mode !== Mode.DEFAULT) {
       this.#pointEditComponent.reset(this.#point);
+      this.#isOtherFormOpen = true;
       this.#replaceFormToCard();
     }
   }
 
   #replaceCardToForm() {
-    replace(this.#pointEditComponent, this.#pointComponent);
+
     document.addEventListener('keydown', this.#escKeyDownHandler);
     this.#handleModeChange();
+    this.#handleModeChange().then(() => {
+      replace(this.#pointEditComponent, this.#pointComponent);
+    });
+
     this.#mode = Mode.EDITING;
+    this.#isEventEditing = true;
   }
 
-  #replaceFormToCard() {
-    const updatedPoint = this.#pointEditComponent._state;
+  async #replaceFormToCard() {
+    const updatedPoint = this.#pointEditComponent.parseStateTo(this.#pointEditComponent._state);
+    const updatedDestination = this.#pointEditComponent.destinations;
+    const updatedOffers = this.#pointEditComponent.offers;
     this.#point = updatedPoint;
-    this.#handleDataChange(UserAction.UPDATE_POINT, UpdateType.PATCH, updatedPoint);
+    if (!this.#isOtherFormOpen && this.#isPointSaving) {
+      await this.#handleDataChange(
+        UserAction.UPDATE_POINT,
+        UpdateType.PATCH,
+        updatedPoint,
+        updatedDestination,
+        updatedOffers
+      );
+    }
+
+    this.#isPointSaving = true;
+    this.#isOtherFormOpen = false;
+
+    // this.#handleDataChange(UserAction.UPDATE_POINT, UpdateType.PATCH, updatedPoint);
     replace(this.#pointComponent, this.#pointEditComponent);
+    this.#isEventEditing = false;
     document.removeEventListener('keydown', this.#escKeyDownHandler);
     this.#mode = Mode.DEFAULT;
   }
@@ -96,7 +127,7 @@ export default class PointPresenter {
   };
 
   #handleFavoriteClick = () => {
-    this.#handleDataChange(UserAction.UPDATE_TASK, UpdateType.MINOR, { ...this.#point, isFavorite: !this.#point.isFavorite });
+    this.#handleDataChange(UserAction.UPDATE_POINT, UpdateType.PATCH, { ...this.#point, isFavorite: !this.#point.isFavorite });
   };
 
   #handleEditClick = () => {
@@ -104,7 +135,7 @@ export default class PointPresenter {
   };
 
   #handleFormSubmit = (update) => {
-    this.#handleDataChange(UserAction.UPDATE_TASK, UpdateType.PATCH,
+    this.#handleDataChange(UserAction.UPDATE_POINT, UpdateType.PATCH,
       update,);
     this.#replaceFormToCard();
   };
@@ -118,4 +149,6 @@ export default class PointPresenter {
       UpdateType.MINOR,
       point,);
   };
+
+
 }

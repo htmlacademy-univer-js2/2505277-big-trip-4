@@ -9,6 +9,7 @@ export default class PointsModel extends Observable {
     super();
 
     this.#pointsApiService = pointsApiService;
+
   }
 
   get points() {
@@ -20,30 +21,29 @@ export default class PointsModel extends Observable {
       const points = await this.#pointsApiService.points;
       this.#points = points.map(this.#adaptToClient);
     } catch (err) {
+
       this.#points = [];
     }
-
     this._notify(UpdateType.INIT);
   }
 
-  set points(points) {
-    this.#points = points;
-  }
-
-  updatePoint(updatedType, update) {
+  async updatePoint(updatedType, update) {
     const index = this.#points.findIndex((point) => point.id === update.id);
 
     if (index === -1) {
       throw new Error('Can\' update unexisting point');
     }
 
+    const response = await this.#pointsApiService.updatePoint(update);
+    const updatedPoint = this.#adaptToClient(response);
     this.#points = [
       ...this.#points.slice(0, index),
-      update,
+      updatedPoint,
       ...this.#points.slice(index + 1)
     ];
 
     this._notify(updatedType, update);
+
   }
 
   addPoint(updateType, update) {
